@@ -1,0 +1,3364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Import Tariff Calculator — Asia-Pacific</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0a1929;
+    --navy-mid: #0d1f33;
+    --navy-light: #112338;
+    --gold: #c89b4a;
+    --gold-light: #e8c47a;
+    --cream: #0c1e30;
+    --cream-dark: #091624;
+    --text: #d4e6f8;
+    --text-muted: #7a9db8;
+    --text-light: #4a6e88;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.13);
+    --white: #ffffff;
+    --danger-bg: #2a0f0f;
+    --danger: #ff7070;
+    --warn-bg: #2a1d08;
+    --warn: #ffb845;
+    --info-bg: #091e38;
+    --info: #5aabff;
+    --success-bg: #082018;
+    --success: #4dbb7a;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 0;
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .header-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-icon svg { width: 14px; height: 14px; fill: var(--navy); }
+
+  header h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    letter-spacing: 0.01em;
+  }
+
+  header h1 em {
+    font-style: normal;
+    color: var(--gold-light);
+    font-weight: 400;
+  }
+
+  .header-badges {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .badge-gold { background: rgba(200,155,74,0.2); color: var(--gold-light); border: 1px solid rgba(200,155,74,0.3); }
+  .badge-white { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.12); }
+
+  .header-rule {
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 40%, transparent 100%);
+  }
+
+  /* Nav strip */
+  .nav-strip {
+    background: var(--navy-mid);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .nav-strip-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .nav-strip-inner::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    padding: 9px 16px;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .nav-tab:hover { color: rgba(255,255,255,0.8); }
+  .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+
+  /* Main layout */
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2.5rem 1.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  /* Panel */
+  .panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .panel-icon svg { width: 12px; height: 12px; stroke: var(--gold-light); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .panel-body { padding: 0.875rem 1rem; }
+
+  /* Form elements */
+  .field { margin-bottom: 0.75rem; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .field select, .field input[type=number] {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: white;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+  }
+
+  .field select {
+    padding-right: 10px;
+  }
+
+  .field select:focus, .field input:focus {
+    border-color: var(--navy-light);
+    box-shadow: 0 0 0 3px rgba(26,50,96,0.08);
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .item-grid { display: flex; flex-direction: column; gap: 4px; }
+
+  .item-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+    text-align: left;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .item-card:hover { border-color: var(--navy-light); background: var(--info-bg); }
+
+  .item-card.active {
+    border-color: var(--navy);
+    background: var(--navy);
+    color: white;
+  }
+
+  .item-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  .item-card.active .item-dot { background: var(--gold); border-color: var(--gold); opacity: 1; }
+
+  .item-name { font-size: 12px; font-weight: 500; line-height: 1.3; }
+  .item-hts {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    margin-top: 1px;
+    opacity: 0.6;
+  }
+
+  /* Results panel */
+  .results-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .results-hero {
+    background: var(--navy);
+    padding: 0.875rem 1.25rem 0.75rem;
+    color: white;
+  }
+
+  .results-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2px;
+  }
+
+  .results-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    line-height: 1;
+    color: white;
+    margin-bottom: 4px;
+  }
+
+  .results-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .results-meta span strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+
+  /* Breakdown */
+  .breakdown { padding: 0 1rem; }
+
+  .bd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    gap: 12px;
+  }
+
+  .bd-row:last-child { border-bottom: none; }
+
+  .bd-label { color: var(--text-muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .bd-val { font-weight: 500; color: var(--text); white-space: nowrap; }
+
+  .bd-row.total {
+    padding: 8px 0;
+    border-top: 2px solid var(--navy);
+    border-bottom: none;
+    margin-top: 2px;
+  }
+
+  .bd-row.total .bd-label { color: var(--text); font-weight: 600; font-size: 13px; }
+  .bd-row.total .bd-val { font-size: 15px; color: var(--navy); }
+
+  /* Tags */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .tag-danger { background: var(--danger-bg); color: var(--danger); }
+  .tag-warn   { background: var(--warn-bg);   color: var(--warn);   }
+  .tag-info   { background: var(--info-bg);   color: var(--info);   }
+  .tag-success{ background: var(--success-bg);color: var(--success);}
+
+  .mono { font-family: 'DM Mono', monospace; font-size: 11px; background: #f0f0f0; padding: 1px 6px; border-radius: 4px; color: var(--text-muted); }
+
+  /* Note box */
+  .note-box {
+    margin: 0 1rem 0.875rem;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.5rem 0.875rem;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .note-box strong { color: var(--text); font-weight: 600; }
+
+  /* AI Agent section */
+  .ai-section {
+    max-width: 1400px;
+    margin: 0 auto 1.25rem;
+    padding: 0 2.5rem;
+  }
+
+  .ai-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .ai-header {
+    background: var(--navy);
+    padding: 0.7rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .ai-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ai-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .ai-title { font-size: 13px; font-weight: 600; color: white; letter-spacing: 0.03em; }
+  .ai-subtitle { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+
+  .ai-analyze-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    background: var(--gold-light);
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+
+  .ai-analyze-btn:hover { background: var(--gold); }
+  .ai-analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .ai-context-bar {
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 8px 1.5rem;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .ai-context-bar span strong { color: rgba(255,255,255,0.75); font-weight: 500; }
+
+  .ai-body { padding: 0.875rem 1.25rem; }
+
+  .ai-idle {
+    text-align: center;
+    padding: 1rem;
+    color: var(--text-light);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .ai-idle-icon { font-size: 1.4rem; margin-bottom: 0.4rem; opacity: 0.4; }
+
+  .ai-loading {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem 1.25rem;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .ai-spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .pros-col, .cons-col {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .col-header {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pros-col .col-header { background: var(--success-bg); color: var(--success); }
+  .cons-col .col-header { background: var(--danger-bg);  color: var(--danger);  }
+
+  .col-items { padding: 0; list-style: none; }
+
+  .col-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .col-item:last-child { border-bottom: none; }
+
+  .col-bullet {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .pros-col .col-bullet { background: var(--success-bg); color: var(--success); }
+  .cons-col .col-bullet { background: var(--danger-bg);  color: var(--danger);  }
+
+  .col-item-text { color: var(--text); }
+  .col-item-label { font-weight: 600; color: inherit; display: block; margin-bottom: 1px; }
+  .pros-col .col-item-label { color: var(--success); }
+  .cons-col .col-item-label { color: var(--danger); }
+  .col-item-desc { color: var(--text-muted); font-size: 12px; }
+
+  .ai-summary {
+    margin-top: 1rem;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.125rem;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .ai-summary strong { color: var(--text); }
+
+  @media (max-width: 600px) {
+    .pros-cons { grid-template-columns: 1fr; }
+  }
+
+  /* Tab panels — visibility controlled via JS inline styles */
+  .tab-panel { }
+
+  .tab-content-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.25rem 2.5rem 2.5rem;
+  }
+
+  .tab-section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+  }
+
+  .tab-intro {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+    max-width: 860px;
+  }
+
+  .tab-footnote {
+    margin-top: 1.5rem;
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.7;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+
+  /* Rate reference table */
+  .ref-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 620px;
+  }
+
+  .ref-table thead tr { background: var(--navy); }
+  .ref-table thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    white-space: nowrap;
+  }
+
+  .ref-table tbody tr:nth-child(even) { background: var(--cream); }
+  .ref-table tbody tr:hover { background: var(--info-bg); }
+
+  .ref-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .group-row td {
+    background: var(--navy-mid) !important;
+    color: rgba(255,255,255,0.6);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+  }
+
+  .rt {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .rt.danger  { background: var(--danger-bg); color: var(--danger); }
+  .rt.warn    { background: var(--warn-bg);   color: var(--warn);   }
+  .rt.success { background: var(--success-bg);color: var(--success);}
+  .rt.neutral { background: #f0f0f0; color: var(--text-muted); }
+
+  /* HTS cards */
+  .hts-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 660px) { .hts-cards { grid-template-columns: 1fr; } }
+
+  .hts-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .hts-card-header {
+    background: var(--navy);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .hts-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--gold-light);
+    letter-spacing: 0.04em;
+  }
+
+  .hts-card-title {
+    padding: 10px 14px 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hts-card-body { padding: 6px 0; }
+
+  .hts-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 14px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .hts-detail-row:last-child { border-bottom: none; }
+
+  .hts-key { color: var(--text-light); flex-shrink: 0; width: 110px; }
+  .hts-val { color: var(--text); text-align: right; flex: 1; }
+  .mono-big { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--navy); }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 120px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 100px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--navy) 0%, var(--border) 100%);
+  }
+
+  .tl-item {
+    position: relative;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  .tl-date {
+    position: absolute;
+    left: -120px;
+    width: 95px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    padding-top: 3px;
+    white-space: nowrap;
+  }
+
+  .tl-dot {
+    position: absolute;
+    left: -6px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .tl-neutral { background: var(--text-muted); }
+  .tl-warn    { background: var(--warn);   }
+  .tl-danger  { background: var(--danger); }
+  .tl-success { background: var(--success);}
+  .tl-current-dot { background: var(--gold); box-shadow: 0 0 0 4px rgba(200,155,74,0.25); }
+
+  .tl-content {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    flex: 1;
+  }
+
+  .tl-item.tl-current .tl-content {
+    border-color: var(--gold);
+    background: #fffdf5;
+  }
+
+  .tl-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+  .tl-desc  { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+  .tl-desc strong { color: var(--text); }
+
+  @media (max-width: 600px) {
+    .timeline { padding-left: 30px; }
+    .timeline::before { left: 8px; }
+    .tl-date { display: none; }
+    .tl-dot { left: -4px; }
+  }
+
+  /* ── Nearshoring tab ── */
+  .ns-wrap { max-width: 1400px; margin: 0 auto; padding: 1rem 2.5rem 2.5rem; }
+  /* ── API Key Banner ── */
+  .api-banner {
+    background: #061320;
+    border-bottom: 1px solid rgba(200,155,74,0.25);
+    padding: 6px 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+  }
+  .api-banner label { color: rgba(255,255,255,0.45); white-space: nowrap; flex-shrink: 0; }
+  .api-banner input {
+    flex: 1;
+    max-width: 340px;
+    height: 26px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 0 8px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .api-banner input:focus { border-color: var(--gold); }
+  .api-banner input::placeholder { color: rgba(255,255,255,0.2); }
+  .api-banner-save {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--navy);
+    background: var(--gold);
+    border: none;
+    border-radius: 4px;
+    padding: 3px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .api-banner-save:hover { background: var(--gold-light); }
+  .api-status { font-size: 10px; white-space: nowrap; }
+  .api-status.ok  { color: #4dbb7a; }
+  .api-status.err { color: #ff7070; }
+  .api-status.none{ color: rgba(255,255,255,0.3); }
+  @media (max-width: 860px) { .api-banner { padding: 6px 1rem; } }
+  @media (max-width: 620px) { .api-banner input { max-width: 160px; } }
+  .ns-flow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: linear-gradient(135deg, #050f1c 0%, #091624 60%, #0a1929 100%);
+    position: relative;
+    min-height: 110px;
+  }
+
+  /* Subtle grid texture */
+  .ns-flow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+  }
+
+  .ns-node {
+    flex: 1;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Origin — blue tint */
+  .ns-node:first-child {
+    background: linear-gradient(160deg, rgba(40,100,200,0.18) 0%, transparent 100%);
+    border-right: 1px solid rgba(90,171,255,0.1);
+  }
+
+  /* Transform — gold tint */
+  .ns-node.mx-node {
+    background: linear-gradient(160deg, rgba(200,155,74,0.2) 0%, transparent 100%);
+    border-right: 1px solid rgba(200,155,74,0.12);
+    border-left: 1px solid rgba(200,155,74,0.12);
+  }
+
+  /* Destination — green tint */
+  .ns-node.us-node {
+    background: linear-gradient(160deg, rgba(50,180,100,0.18) 0%, transparent 100%);
+    border-left: 1px solid rgba(77,187,122,0.1);
+  }
+
+  .ns-node-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+  }
+
+  .ns-node:first-child .ns-node-badge { background: rgba(90,171,255,0.15); color: rgba(90,171,255,0.8); border: 1px solid rgba(90,171,255,0.2); }
+  .ns-node.mx-node    .ns-node-badge { background: rgba(200,155,74,0.15); color: rgba(200,155,74,0.9); border: 1px solid rgba(200,155,74,0.25); }
+  .ns-node.us-node    .ns-node-badge { background: rgba(77,187,122,0.15); color: rgba(77,187,122,0.9); border: 1px solid rgba(77,187,122,0.2); }
+
+  .ns-node-flag {
+    margin-bottom: 6px;
+  }
+
+  .ns-flag-icon {
+    width: 48px !important;
+    height: 32px !important;
+    border-radius: 5px;
+    border: 2px solid rgba(255,255,255,0.2);
+    display: block !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .ns-node-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.01em;
+  }
+
+  .ns-node-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 1px;
+  }
+
+  /* Arrow connector */
+  .ns-arrow {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 4px;
+    z-index: 2;
+    position: relative;
+  }
+
+  .ns-arrow-line {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .ns-arrow-dash {
+    width: 28px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+  }
+
+  .ns-arrow-head {
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid rgba(255,255,255,0.35);
+  }
+
+  .ns-arrow-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.05);
+    padding: 2px 7px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .ns-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem; }
+  @media (max-width: 720px) { .ns-grid { grid-template-columns: 1fr; } }
+  .ns-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+  .ns-card-header {
+    position: relative; overflow: hidden;
+    padding: 11px 14px 11px;
+    display: flex; align-items: center; gap: 10px;
+    min-height: 62px;
+  }
+  .ns-card-header.leg1 { background: linear-gradient(135deg, #071e38 0%, #0b2d56 100%); }
+  .ns-card-header.leg2 { background: linear-gradient(135deg, #1c1000 0%, #321c04 100%); }
+  .ns-card-header.leg3 { background: linear-gradient(135deg, #041810 0%, #082a18 100%); }
+
+  .ns-card-step-num {
+    font-size: 54px; font-weight: 800; line-height: 1;
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-family: 'DM Serif Display', serif; letter-spacing: -0.04em;
+    opacity: 0.09; color: white; pointer-events: none; user-select: none;
+  }
+
+  .ns-card-icon-box {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; flex-shrink: 0;
+  }
+  .leg1 .ns-card-icon-box { background: rgba(90,171,255,0.18); border: 1px solid rgba(90,171,255,0.28); }
+  .leg2 .ns-card-icon-box { background: rgba(200,155,74,0.18); border: 1px solid rgba(200,155,74,0.28); }
+  .leg3 .ns-card-icon-box { background: rgba(77,187,122,0.18); border: 1px solid rgba(77,187,122,0.28); }
+
+  .ns-card-header-flag {
+    width: 36px;
+    height: 24px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    display: block !important;
+  }
+
+  .ns-card-header-text { flex: 1; min-width: 0; }
+  .ns-card-header-step { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.55; margin-bottom: 2px; color: white; }
+  .ns-card-header-title { font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ns-card-leg-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; margin-top: 3px; }
+  .leg1 .ns-card-leg-sub { color: rgba(90,171,255,0.65); }
+  .leg2 .ns-card-leg-sub { color: rgba(200,155,74,0.65); }
+  .leg3 .ns-card-leg-sub { color: rgba(77,187,122,0.65); }
+
+  .ns-card-accent {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  }
+  .leg1 .ns-card-accent { background: linear-gradient(90deg, rgba(90,171,255,0.9) 0%, transparent 80%); }
+  .leg2 .ns-card-accent { background: linear-gradient(90deg, rgba(200,155,74,0.9) 0%, transparent 80%); }
+  .leg3 .ns-card-accent { background: linear-gradient(90deg, rgba(77,187,122,0.9) 0%, transparent 80%); }
+
+  .ns-card-body { padding: 12px 14px 10px; }
+
+  .ns-field { margin-bottom: 10px; }
+  .ns-field:last-child { margin-bottom: 0; }
+  .ns-field label {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); display: flex; align-items: center; gap: 5px; margin-bottom: 4px;
+  }
+  .ns-field label i { font-size: 12px; opacity: 0.75; }
+
+  .ns-field select, .ns-field input[type=number] { width: 100%; height: 38px; padding: 0 10px; border: 1px solid var(--border-strong); border-radius: 7px; font-size: 13px; font-family: 'Inter', sans-serif; color: var(--text); background: white; outline: none; -webkit-appearance: none; }
+  .ns-field select { background-image: none; padding-right: 10px; }
+  .ns-field select:focus, .ns-field input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,155,74,0.12); }
+  .ns-hint { font-size: 10px; color: var(--text-light); margin-top: 3px; line-height: 1.5; }
+  .ns-results { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  .ns-results-header { background: var(--navy); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+  .ns-results-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+  .ns-results-total { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: white; line-height: 1; }
+  .ns-vs { display: flex; gap: 1.5rem; align-items: flex-end; }
+  .ns-vs-item { text-align: right; }
+  .ns-vs-item .vl { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 2px; }
+  .ns-vs-item .vv { font-size: 15px; font-weight: 600; color: white; }
+  .ns-vs-item .vv.saving { color: #6ee7a0; }
+  .ns-vs-item .vv.extra  { color: #fca5a5; }
+  .ns-legs { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .ns-leg { padding: 1rem 1.25rem; border-right: 1px solid var(--border); }
+  .ns-leg:last-child { border-right: none; }
+  .ns-leg-label { font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-light); margin-bottom: 8px; }
+  .ns-lr { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); gap: 8px; }
+  .ns-lr:last-child { border-bottom: none; }
+  .ns-lr .lk { color: var(--text-muted); }
+  .ns-lr .lv { font-weight: 500; color: var(--text); text-align: right; }
+  .ns-lr.subtotal .lk { font-weight: 600; color: var(--text); }
+  .ns-lr.subtotal .lv { color: var(--navy); font-weight: 700; }
+  .usmca-bar { margin: 0 1.25rem 1.25rem; border-radius: 8px; padding: 10px 14px; font-size: 12px; line-height: 1.6; display: flex; gap: 10px; align-items: flex-start; }
+  .usmca-bar.qualified   { background: var(--success-bg); color: var(--success); border: 1px solid rgba(26,122,69,0.2); }
+  .usmca-bar.unqualified { background: var(--danger-bg);  color: var(--danger);  border: 1px solid rgba(192,57,43,0.2); }
+  .usmca-bar.borderline  { background: var(--warn-bg);    color: var(--warn);    border: 1px solid rgba(154,98,0,0.2); }
+  .usmca-icon { font-size: 1.1rem; flex-shrink: 0; }
+  .ns-compare { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .ns-compare-header { background: var(--cream-dark); padding: 10px 1.25rem; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+  .ns-compare-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  .ns-compare-col { padding: 1rem 1.25rem; }
+  .ns-compare-col:first-child { border-right: 1px solid var(--border); }
+  .ns-compare-col-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .ns-compare-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .ns-compare-row:last-child { border-bottom: none; }
+  .ns-compare-row .ck { color: var(--text-muted); }
+  .ns-compare-row .cv { font-weight: 500; }
+  .ns-total-row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; padding: 10px 1.25rem; background: var(--cream); border-top: 2px solid var(--navy); }
+  .ns-total-row .winner { color: var(--success); }
+  .ns-total-row .loser  { color: var(--danger); }
+  @media (max-width: 600px) {
+    .ns-flow { flex-direction: column; }
+    .ns-legs { grid-template-columns: 1fr; }
+    .ns-leg { border-right: none; border-bottom: 1px solid var(--border); }
+    .ns-compare-grid { grid-template-columns: 1fr; }
+    .ns-compare-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  /* Flag display */
+  .flag-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    background: var(--cream);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    margin-bottom: 5px;
+  }
+  .flag-icon-display {
+    width: 30px !important;
+    height: 20px !important;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.12);
+    flex-shrink: 0;
+  }
+  .flag-label { font-size: 12px; font-weight: 600; color: var(--text); }
+  .flag-label-sub { font-size: 10px; color: var(--text-muted); margin-left: auto; }
+
+  /* Nearshoring flow flag */
+  .ns-flag-icon {
+    width: 44px !important;
+    height: 30px !important;
+    border-radius: 3px;
+    border: 2px solid rgba(255,255,255,0.25);
+    margin: 0 auto 4px;
+    display: block !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  }
+
+  /* ── Ask me a question ── */
+  .qa-section {
+    max-width: 1400px;
+    margin: 0 auto 1rem;
+    padding: 0 2.5rem;
+  }
+
+  .qa-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .qa-header {
+    background: #0f1f3a;
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .qa-header-left { display: flex; align-items: center; gap: 10px; }
+  .qa-icon { font-size: 1rem; }
+  .qa-title { font-size: 13px; font-weight: 600; color: white; }
+  .qa-subtitle { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+  .qa-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .qa-clear-btn:hover {
+    background: rgba(255,100,100,0.15);
+    border-color: rgba(255,100,100,0.35);
+    color: #ff8080;
+  }
+
+  .qa-clear-btn:active { transform: scale(0.96); }
+
+  .qa-clear-btn svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    flex-shrink: 0;
+  }
+
+  .qa-status {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    padding: 3px 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+  }
+
+  .qa-status.active { color: #6ee7a0; border-color: rgba(110,231,160,0.3); }
+  .qa-status.thinking { color: var(--gold-light); border-color: rgba(200,155,74,0.3); }
+
+  .qa-chips {
+    padding: 8px 1.25rem;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+  }
+
+  .qa-chip {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--navy);
+    background: white;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .qa-chip:hover { background: var(--navy); color: white; border-color: var(--navy); }
+
+  .qa-messages {
+    min-height: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .qa-msg {
+    padding: 0.75rem 1.25rem;
+    font-size: 13px;
+    line-height: 1.65;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .qa-msg:last-child { border-bottom: none; }
+
+  .qa-msg.user { background: var(--info-bg); }
+  .qa-msg.assistant { background: white; }
+
+  .qa-msg-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .qa-msg.user .qa-msg-avatar { background: var(--navy); color: var(--gold-light); }
+  .qa-msg.assistant .qa-msg-avatar { background: var(--gold); color: var(--navy); font-size: 10px; }
+
+  .qa-msg-text { color: var(--text); flex: 1; }
+  .qa-msg.user .qa-msg-text { color: var(--info); font-weight: 500; }
+
+  .qa-typing {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 2px 0;
+  }
+
+  .qa-typing span {
+    width: 5px; height: 5px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+
+  .qa-typing span:nth-child(2) { animation-delay: 0.2s; }
+  .qa-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+
+  .qa-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--cream);
+  }
+
+  .qa-input-bar input {
+    flex: 1;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: white;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .qa-input-bar input:focus {
+    border-color: var(--navy-light);
+    box-shadow: 0 0 0 3px rgba(26,50,96,0.08);
+  }
+
+  .qa-send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .qa-send-btn:hover { background: var(--navy-light); }
+  .qa-send-btn:active { transform: scale(0.93); }
+  .qa-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .qa-send-btn svg { width: 15px; height: 15px; stroke: white; margin-left: 2px; }
+
+  /* Disclaimer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 0.875rem 2.5rem;
+  }
+
+  .disclaimer {
+    max-width: 1400px;
+    margin: 0 auto;
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.6;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .disclaimer-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Responsive */
+  /* ══════════════════════════════════════════
+     RESPONSIVE / FLUID LAYOUT
+     ══════════════════════════════════════════ */
+
+  /* ── Header: shrink title and hide badges progressively ── */
+  @media (max-width: 1100px) {
+    .badge-white:last-child { display: none; }
+    main { padding: 0.75rem 1.5rem 1.25rem; }
+    .ai-section, .qa-section { padding: 0 1.5rem; }
+    .tab-content-wrap, .ns-wrap { padding: 1rem 1.5rem 2rem; }
+  }
+
+  @media (max-width: 860px) {
+    /* Hide all badges, shorten title */
+    .header-badges { display: none; }
+    header h1 em { display: none; }
+    header h1::after { content: ''; }
+    .header-inner { padding: 0 1.25rem; }
+
+    /* Nav: let tabs scroll horizontally */
+    .nav-strip-inner { padding: 0 1rem; gap: 0; }
+    .nav-tab { padding: 8px 12px; font-size: 11px; }
+
+    /* Main: stack columns */
+    main {
+      grid-template-columns: 1fr;
+      padding: 0.75rem 1.25rem 1.25rem;
+      gap: 0.875rem;
+    }
+
+    /* Nearshoring grid: 1 col */
+    .ns-grid { grid-template-columns: 1fr !important; }
+    .ns-legs { grid-template-columns: 1fr; }
+    .ns-leg { border-right: none !important; border-bottom: 1px solid var(--border); }
+    .ns-compare-grid { grid-template-columns: 1fr; }
+    .ns-compare-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+
+    /* AI / QA padding */
+    .ai-section, .qa-section { padding: 0 1rem; margin-bottom: 0.75rem; }
+    .tab-content-wrap, .ns-wrap { padding: 0.875rem 1rem 1.5rem; }
+
+    /* Results */
+    .results-amount { font-size: 1.9rem; }
+    .ns-results-total { font-size: 1.8rem; }
+  }
+
+  @media (max-width: 620px) {
+    /* Header: icon only */
+    header h1 { display: none; }
+    .header-inner { height: 44px; padding: 0 1rem; }
+    .header-rule { height: 2px; }
+
+    /* Nav: smaller */
+    .nav-tab { padding: 7px 10px; font-size: 10px; letter-spacing: 0; }
+
+    /* Main padding */
+    main { padding: 0.625rem 0.875rem 1rem; }
+    .ai-section, .qa-section { padding: 0 0.875rem; }
+    .tab-content-wrap, .ns-wrap { padding: 0.75rem 0.875rem 1.25rem; }
+
+    /* HTS cards: 1 col */
+    .hts-cards { grid-template-columns: 1fr; }
+
+    /* Flow diagram: vertical */
+    .ns-flow { flex-direction: column; min-height: unset; }
+    .ns-arrow { flex-direction: row; transform: none; padding: 4px 0; }
+    .ns-arrow-line { transform: rotate(90deg); }
+    .ns-arrow-label { margin-left: 8px; }
+
+    /* Pros/cons: stack */
+    .pros-cons { grid-template-columns: 1fr; }
+
+    /* Timeline: hide dates */
+    .timeline { padding-left: 28px; }
+    .timeline::before { left: 8px; }
+    .tl-date { display: none; }
+    .tl-dot { left: -3px; }
+
+    /* Field rows: stack */
+    .field-row, .row2 { grid-template-columns: 1fr; }
+
+    /* Results meta: stack */
+    .results-meta { flex-direction: column; gap: 4px; }
+    .ns-vs { flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+
+  @media (max-width: 400px) {
+    .nav-tab { padding: 6px 8px; font-size: 9.5px; }
+    main { padding: 0.5rem; gap: 0.625rem; }
+    .panel-body { padding: 0.625rem 0.75rem; }
+    .results-amount { font-size: 1.6rem; }
+  }
+
+  /* ═══════════ DARK THEME OVERRIDES ═══════════ */
+
+  /* Panel & card surfaces */
+  .panel, .results-panel, .ai-panel, .qa-panel,
+  .ns-card, .ns-results, .ns-compare, .hts-card,
+  .tl-content, .qa-msg.assistant {
+    background: #0f2035;
+    border-color: rgba(255,255,255,0.09);
+  }
+
+  /* Slightly elevated surface for items / inputs */
+  .item-card, .field select, .field input[type=number],
+  .ns-field select, .ns-field input[type=number],
+  .qa-input-bar input {
+    background: #132840;
+    color: var(--text);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .item-card:hover { background: #1a3555; border-color: rgba(255,255,255,0.2); }
+  .item-card.active { background: var(--navy-light); border-color: rgba(255,255,255,0.25); }
+
+  .field select { background-image: none; padding-right: 10px; }
+  .ns-field select { background-image: none; padding-right: 10px; background-color: #132840; color: var(--text); border-color: rgba(255,255,255,0.12); }
+
+  /* Flag & form context strips */
+  .flag-display, .qa-chips, .qa-input-bar,
+  .ns-compare-header, .ref-table-wrap {
+    background: #091624;
+    border-color: rgba(255,255,255,0.07);
+  }
+
+  .qa-chip { background: #132840; color: #9abdd8; border-color: rgba(255,255,255,0.12); }
+  .qa-chip:hover { background: #1e4070; color: white; border-color: transparent; }
+  .qa-msg.user { background: #091e38; }
+
+  /* Table rows */
+  .ref-table tbody tr { background: #0f2035; }
+  .ref-table tbody tr:nth-child(even) { background: #0c1a2c; }
+  .ref-table tbody tr:hover { background: #132840; }
+  .group-row td { background: #091624 !important; color: rgba(255,255,255,0.45); }
+
+  /* Text overrides — things that used dark navy as text on light bg */
+  .tab-section-title { color: var(--text); }
+  .ns-compare-col-title { color: var(--text); }
+  .bd-row.total .bd-val { color: var(--gold-light); }
+  .ns-total-row { background: #091624; border-top-color: rgba(255,255,255,0.1); }
+  .ns-total-row .winner { color: #4dbb7a; }
+  .ns-total-row .loser  { color: #ff7070; }
+  .hts-card-title { color: var(--text); border-color: rgba(255,255,255,0.08); background: #0f2035; }
+  .hts-key { color: var(--text-muted); }
+  .hts-val { color: var(--text); }
+  .hts-detail-row { border-color: rgba(255,255,255,0.06); }
+  .mono-big { color: var(--gold-light); }
+
+  /* Misc elements */
+  .mono { background: rgba(255,255,255,0.08); color: #8ab4d4; }
+  .ai-summary { background: #091624; border-color: rgba(255,255,255,0.08); color: var(--text-muted); }
+  .ai-summary strong { color: var(--text); }
+  .col-item { border-color: rgba(255,255,255,0.07); }
+  .col-item-text { color: var(--text); }
+  .tl-item.tl-current .tl-content { background: #0e2118; border-color: var(--gold); }
+  .note-box { background: #091624; border-color: rgba(255,255,255,0.07); }
+  .note-box strong { color: var(--text); }
+
+  /* Focus rings adjusted for dark */
+  .field select:focus, .field input:focus,
+  .ns-field select:focus, .ns-field input:focus,
+  .qa-input-bar input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(200,155,74,0.15);
+  }
+
+  /* Dropdown options */
+  option, optgroup { background: #0f2035; color: var(--text); }
+
+  /* ns-legs dividers */
+  .ns-leg { border-color: rgba(255,255,255,0.07); }
+  .ns-compare-col:first-child { border-color: rgba(255,255,255,0.07); }
+  .ns-compare-col { background: #0f2035; }
+  .ns-compare-row { border-color: rgba(255,255,255,0.06); }
+  .ns-compare-row .ck { color: var(--text-muted); }
+  .ns-compare-row .cv { color: var(--text); }
+
+  /* Field-row row dividers */
+  .bd-row { border-color: rgba(255,255,255,0.07); }
+  .ns-lr { border-color: rgba(255,255,255,0.07); }
+  .ns-lr .lk { color: var(--text-muted); }
+  .ns-lr .lv { color: var(--text); }
+
+  /* Timeline */
+  .timeline::before { background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.04) 100%); }
+  .tl-date { color: var(--text-light); }
+  .tl-desc { color: var(--text-muted); }
+  .tl-title { color: var(--text); }
+
+  /* Scroll bar for qa messages */
+  #qa-messages::-webkit-scrollbar { width: 4px; }
+  #qa-messages::-webkit-scrollbar-track { background: #091624; }
+  #qa-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+  /* ═══════════ HOVER GLOW EFFECTS ═══════════ */
+
+  /* Base transition on all glowable surfaces */
+  .panel, .results-panel, .ai-panel, .qa-panel,
+  .ns-card, .ns-results, .ns-compare, .hts-card,
+  .tl-content, .item-card, .flag-display {
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, background 0.2s ease;
+  }
+
+  /* Gold glow — primary panels */
+  .panel:hover, .results-panel:hover, .ai-panel:hover, .qa-panel:hover,
+  .ns-results:hover, .ns-compare:hover {
+    box-shadow: 0 0 0 1px rgba(200,155,74,0.4),
+                0 0 28px rgba(200,155,74,0.14),
+                0 6px 24px rgba(0,0,0,0.4);
+    border-color: rgba(200,155,74,0.35);
+  }
+
+  /* Blue glow — data/info cards */
+  .ns-card:hover {
+    box-shadow: 0 0 0 1px rgba(90,171,255,0.35),
+                0 0 24px rgba(90,171,255,0.12),
+                0 4px 18px rgba(0,0,0,0.35);
+    border-color: rgba(90,171,255,0.3);
+  }
+
+  /* Blue glow — HTS & reference cards */
+  .hts-card:hover {
+    box-shadow: 0 0 0 1px rgba(90,171,255,0.3),
+                0 0 22px rgba(90,171,255,0.1),
+                0 4px 16px rgba(0,0,0,0.3);
+    border-color: rgba(90,171,255,0.28);
+  }
+
+  /* Soft gold glow — timeline entries */
+  .tl-content:hover {
+    box-shadow: 0 0 0 1px rgba(200,155,74,0.25),
+                0 0 16px rgba(200,155,74,0.08),
+                0 2px 12px rgba(0,0,0,0.3);
+    border-color: rgba(200,155,74,0.22);
+  }
+
+  /* Item cards — brighter blue glow on hover */
+  .item-card:hover {
+    box-shadow: 0 0 0 1px rgba(90,171,255,0.4),
+                0 0 18px rgba(90,171,255,0.14);
+    background: #1a3555;
+    border-color: rgba(90,171,255,0.35);
+  }
+
+  /* Active item card — gold glow */
+  .item-card.active {
+    box-shadow: 0 0 0 1px rgba(200,155,74,0.5),
+                0 0 20px rgba(200,155,74,0.18);
+    border-color: rgba(200,155,74,0.4);
+  }
+
+  /* Flag display — subtle lift */
+  .flag-display:hover {
+    box-shadow: 0 0 0 1px rgba(200,155,74,0.3),
+                0 0 14px rgba(200,155,74,0.1);
+    border-color: rgba(200,155,74,0.28);
+  }
+
+  /* Rate reference table rows */
+  .ref-table tbody tr {
+    transition: box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .ref-table tbody tr:hover {
+    background: #132840;
+    box-shadow: inset 3px 0 0 var(--gold);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h1>US Import Tariff Calculator &mdash; <em>Asia-Pacific Edition</em></h1>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-gold">May 2026</span>
+      <span class="badge badge-white">Sec. 232 · 301 · 122</span>
+      <span class="badge badge-white">Proc. 11021</span>
+    </div>
+  </div>
+  <div class="header-rule"></div>
+</header>
+
+<div class="api-banner" id="api-banner">
+  <label>🔑 Anthropic API Key</label>
+  <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+  <button class="api-banner-save" onclick="saveApiKey()">Save</button>
+  <span class="api-status none" id="api-status">Not set — AI features disabled</span>
+</div>
+
+<div class="nav-strip">
+  <div class="nav-strip-inner">
+    <button class="nav-tab active" data-tab="calculator">US Import Calculator</button>
+    <button class="nav-tab" data-tab="nearshore">Nearshoring Calculator</button>
+    <button class="nav-tab" data-tab="rates">Rate Reference</button>
+    <button class="nav-tab" data-tab="hts">HTS Codes</button>
+    <button class="nav-tab" data-tab="timeline">Policy Timeline</button>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-calculator" style="display:block">
+<main>
+  <!-- Left column: inputs -->
+  <div style="display:flex;flex-direction:column;gap:0.75rem;">
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <span class="panel-title">Select Product</span>
+      </div>
+      <div class="panel-body">
+        <div class="item-grid" id="item-grid">
+          <button class="item-card active" data-id="0">
+            <span class="item-dot"></span>
+            <div>
+              <div class="item-name">Raw Aluminum (non-alloyed)</div>
+              <div class="item-hts">HTS 7601.10.30 / 7601.10.60</div>
+            </div>
+          </button>
+          <button class="item-card" data-id="1">
+            <span class="item-dot"></span>
+            <div>
+              <div class="item-name">Raw Steel (non-alloy ingots)</div>
+              <div class="item-hts">HTS 7206.10.00</div>
+            </div>
+          </button>
+          <button class="item-card" data-id="2">
+            <span class="item-dot"></span>
+            <div>
+              <div class="item-name">Aluminum with LED Lighting</div>
+              <div class="item-hts">HTS 9405.42</div>
+            </div>
+          </button>
+          <button class="item-card" data-id="3">
+            <span class="item-dot"></span>
+            <div>
+              <div class="item-name">Aluminum + Plastic + Steel</div>
+              <div class="item-hts">HTS 7616.99 / 8302</div>
+            </div>
+          </button>
+          <button class="item-card" data-id="4">
+            <span class="item-dot"></span>
+            <div>
+              <div class="item-name">Printed Graphics (fabric / vinyl)</div>
+              <div class="item-hts">HTS 4911.91 / 5907.00 / 3919.90</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <span class="panel-title">Shipment Details</span>
+      </div>
+      <div class="panel-body">
+        <div class="field">
+          <label>Country of Origin</label>
+          <div class="flag-display">
+            <span class="fi fi-cn flag-icon-display" id="flag-img-main"></span>
+            <span class="flag-label" id="flag-label-main">China</span>
+            <span class="flag-label-sub" id="flag-region-main">East Asia</span>
+          </div>
+          <select id="country">
+            <optgroup label="── East Asia ──">
+              <option value="china">🇨🇳 China</option>
+              <option value="japan">🇯🇵 Japan</option>
+              <option value="south_korea">🇰🇷 South Korea</option>
+              <option value="taiwan">🇹🇼 Taiwan</option>
+              <option value="hong_kong">🇭🇰 Hong Kong</option>
+              <option value="mongolia">🇲🇳 Mongolia</option>
+            </optgroup>
+            <optgroup label="── Southeast Asia ──">
+              <option value="vietnam">🇻🇳 Vietnam</option>
+              <option value="thailand">🇹🇭 Thailand</option>
+              <option value="indonesia">🇮🇩 Indonesia</option>
+              <option value="malaysia">🇲🇾 Malaysia</option>
+              <option value="philippines">🇵🇭 Philippines</option>
+              <option value="singapore">🇸🇬 Singapore</option>
+              <option value="cambodia">🇰🇭 Cambodia</option>
+              <option value="myanmar">🇲🇲 Myanmar</option>
+              <option value="laos">🇱🇦 Laos</option>
+              <option value="brunei">🇧🇳 Brunei</option>
+              <option value="timor_leste">🇹🇱 Timor-Leste</option>
+            </optgroup>
+            <optgroup label="── South Asia ──">
+              <option value="india">🇮🇳 India</option>
+              <option value="bangladesh">🇧🇩 Bangladesh</option>
+              <option value="pakistan">🇵🇰 Pakistan</option>
+              <option value="sri_lanka">🇱🇰 Sri Lanka</option>
+              <option value="nepal">🇳🇵 Nepal</option>
+              <option value="bhutan">🇧🇹 Bhutan</option>
+              <option value="maldives">🇲🇻 Maldives</option>
+            </optgroup>
+            <optgroup label="── Central Asia ──">
+              <option value="kazakhstan">🇰🇿 Kazakhstan</option>
+              <option value="uzbekistan">🇺🇿 Uzbekistan</option>
+              <option value="kyrgyzstan">🇰🇬 Kyrgyzstan</option>
+              <option value="tajikistan">🇹🇯 Tajikistan</option>
+              <option value="turkmenistan">🇹🇲 Turkmenistan</option>
+              <option value="afghanistan">🇦🇫 Afghanistan</option>
+            </optgroup>
+            <optgroup label="── Oceania ──">
+              <option value="australia">🇦🇺 Australia</option>
+              <option value="new_zealand">🇳🇿 New Zealand</option>
+              <option value="papua_new_guinea">🇵🇬 Papua New Guinea</option>
+              <option value="fiji">🇫🇯 Fiji</option>
+              <option value="solomon_islands">🇸🇧 Solomon Islands</option>
+              <option value="vanuatu">🇻🇺 Vanuatu</option>
+              <option value="samoa">🇼🇸 Samoa</option>
+              <option value="tonga">🇹🇴 Tonga</option>
+              <option value="kiribati">🇰🇮 Kiribati</option>
+              <option value="micronesia">🇫🇲 Micronesia</option>
+              <option value="palau">🇵🇼 Palau</option>
+              <option value="marshall_islands">🇲🇭 Marshall Islands</option>
+              <option value="nauru">🇳🇷 Nauru</option>
+              <option value="tuvalu">🇹🇻 Tuvalu</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Unit Value (USD)</label>
+            <input type="number" id="value" value="10000" min="0" step="100">
+          </div>
+          <div class="field">
+            <label>Quantity</label>
+            <input type="number" id="qty" value="1" min="1">
+          </div>
+        </div>
+        <div class="field" id="metal-pct-field" style="display:none">
+          <label>Metal % of Item Value</label>
+          <input type="number" id="metal-pct" value="40" min="0" max="100" step="5">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right column: results -->
+  <div class="results-panel">
+    <div class="results-hero">
+      <div class="results-label">Estimated Total Tariff</div>
+      <div class="results-amount" id="total-amt">$0.00</div>
+      <div class="results-meta">
+        <span>Effective rate: <strong id="eff-rate">0%</strong></span>
+        <span>Landed cost: <strong id="landed">$0.00</strong></span>
+      </div>
+    </div>
+
+    <div class="breakdown" id="breakdown" style="padding-top:0.25rem;"></div>
+
+    <div class="note-box" id="note-box" style="display:none">
+      <strong>Classification note:</strong> <span id="note-text"></span>
+    </div>
+  </div>
+</main>
+
+<!-- AI Agent Section -->
+<div class="ai-section">
+  <div class="ai-panel">
+    <div class="ai-header">
+      <div class="ai-header-left">
+        <div class="ai-dot"></div>
+        <div>
+          <div class="ai-title">AI Trade Analyst</div>
+          <div class="ai-subtitle">Sourcing intelligence powered by Claude</div>
+        </div>
+      </div>
+      <button class="ai-analyze-btn" id="ai-btn" onclick="runAnalysis()">
+        &#9654; Analyze Country
+      </button>
+    </div>
+    <div class="ai-context-bar" id="ai-context-bar">
+      <span>Country: <strong id="ctx-country">—</strong></span>
+      <span>Product: <strong id="ctx-product">—</strong></span>
+      <span>Effective tariff: <strong id="ctx-rate">—</strong></span>
+    </div>
+    <div class="ai-body">
+      <div class="ai-idle" id="ai-idle">
+        <div class="ai-idle-icon">🌏</div>
+        Select a country and product above, then click <strong>Analyze Country</strong> to get AI-powered sourcing pros and cons.
+      </div>
+      <div class="ai-loading" id="ai-loading">
+        <div class="ai-spinner"></div>
+        <span id="ai-loading-text">Analyzing sourcing factors…</span>
+      </div>
+      <div id="ai-results" style="display:none">
+        <div class="pros-cons" id="pros-cons-grid"></div>
+        <div class="ai-summary" id="ai-summary"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ask me a question -->
+<div class="qa-section">
+  <div class="qa-panel">
+    <div class="qa-header">
+      <div class="qa-header-left">
+        <div class="qa-icon">💬</div>
+        <div>
+          <div class="qa-title">Ask me a question</div>
+          <div class="qa-subtitle">Trade &amp; tariff assistant powered by Claude</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="qa-clear-btn" id="qa-clear" onclick="clearChat()" title="Clear conversation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+          Restart
+        </button>
+        <div class="qa-status" id="qa-status">Ready</div>
+      </div>
+    </div>
+
+    <div class="qa-chips" id="qa-chips">
+      <button class="qa-chip" onclick="askChip(this)">Which country has the lowest tariff?</button>
+      <button class="qa-chip" onclick="askChip(this)">Explain Section 232</button>
+      <button class="qa-chip" onclick="askChip(this)">Is nearshoring via Mexico worth it?</button>
+      <button class="qa-chip" onclick="askChip(this)">What is USMCA?</button>
+      <button class="qa-chip" onclick="askChip(this)">How does Section 301 affect China imports?</button>
+      <button class="qa-chip" onclick="askChip(this)">When does Section 122 expire?</button>
+    </div>
+
+    <div class="qa-messages" id="qa-messages"></div>
+
+    <div class="qa-input-bar">
+      <input type="text" id="qa-input" placeholder="Ask anything about tariffs, trade policy, or sourcing…" maxlength="400" autocomplete="off">
+      <button class="qa-send-btn" id="qa-send" onclick="sendQuestion()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end tab-calculator -->
+
+<!-- ═══════════ RATE REFERENCE TAB ═══════════ -->
+<div class="tab-panel" id="tab-rates" style="display:none">
+  <div class="tab-content-wrap">
+    <div class="tab-section-title">Section 232 Tariff Rates by Country — Asia-Pacific</div>
+    <p class="tab-intro">As of April 6, 2026 (Proclamation 11021), Section 232 tariffs apply to the <strong>full customs value</strong> of covered goods. Rates vary by product category and country-specific arrangements.</p>
+
+    <div class="ref-table-wrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th>Country</th>
+            <th>Raw Al &amp; Steel</th>
+            <th>Al/Steel Derivative (&ge;50% metal)</th>
+            <th>Mixed Derivative (15–49%)</th>
+            <th>Section 122</th>
+            <th>Section 301</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group-row"><td colspan="6">East Asia</td></tr>
+          <tr><td>China</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt warn">7.5–100%</span></td></tr>
+          <tr><td>Japan</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>South Korea</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Taiwan</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Hong Kong</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Mongolia</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+
+          <tr class="group-row"><td colspan="6">Southeast Asia</td></tr>
+          <tr><td>Vietnam</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Thailand</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Indonesia</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Malaysia</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Philippines</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Singapore</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Cambodia</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Myanmar</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Laos</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Brunei / Timor-Leste</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+
+          <tr class="group-row"><td colspan="6">South Asia</td></tr>
+          <tr><td>India</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Bangladesh</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Pakistan</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Sri Lanka / Nepal / Others</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+
+          <tr class="group-row"><td colspan="6">Oceania</td></tr>
+          <tr><td><strong>Australia</strong></td><td><span class="rt success">Exempt</span></td><td><span class="rt success">Exempt</span></td><td><span class="rt success">Exempt</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>New Zealand</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+          <tr><td>Pacific Islands</td><td><span class="rt danger">50%</span></td><td><span class="rt danger">25%</span></td><td><span class="rt warn">15% min</span></td><td><span class="rt warn">10%*</span></td><td><span class="rt neutral">None</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tab-footnote">* Section 122 (10% global tariff) does not apply to goods already subject to Section 232 — anti-stacking rule applies. Section 122 expires ~July 24, 2026 unless Congress extends it. Section 301 rates on Chinese goods range from 7.5% to 100% depending on the specific product.</div>
+  </div>
+</div>
+
+<!-- ═══════════ HTS CODES TAB ═══════════ -->
+<div class="tab-panel" id="tab-hts" style="display:none">
+  <div class="tab-content-wrap">
+    <div class="tab-section-title">HTS Code Reference — Your Products</div>
+    <p class="tab-intro">The Harmonized Tariff Schedule (HTS) codes below apply to the four products in this calculator. The first 6 digits are internationally standardized; digits 7–10 are US-specific.</p>
+
+    <div class="hts-cards">
+
+      <div class="hts-card">
+        <div class="hts-card-header">
+          <div class="hts-num">7601.10</div>
+          <span class="rt danger">Sec. 232 — 50%</span>
+        </div>
+        <div class="hts-card-title">Raw Aluminum (non-alloyed, unwrought)</div>
+        <div class="hts-card-body">
+          <div class="hts-detail-row"><span class="hts-key">Full US code</span><span class="hts-val mono-big">7601.10.30 / 7601.10.60</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Chapter</span><span class="hts-val">76 — Aluminum and articles thereof</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Heading</span><span class="hts-val">7601 — Unwrought aluminum</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Subheading</span><span class="hts-val">7601.10 — Non-alloyed (≥99% Al)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">MFN base duty</span><span class="hts-val">2.5%</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 232</span><span class="hts-val">50% on full value (Annex I-A)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 122</span><span class="hts-val">Exempt (anti-stacking)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Notes</span><span class="hts-val">Use 7601.20 for alloyed unwrought aluminum. Australian imports exempt from Sec. 232.</span></div>
+        </div>
+      </div>
+
+      <div class="hts-card">
+        <div class="hts-card-header">
+          <div class="hts-num">7206.10</div>
+          <span class="rt danger">Sec. 232 — 50%</span>
+        </div>
+        <div class="hts-card-title">Raw Steel (non-alloy ingots, unwrought)</div>
+        <div class="hts-card-body">
+          <div class="hts-detail-row"><span class="hts-key">Full US code</span><span class="hts-val mono-big">7206.10.00</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Chapter</span><span class="hts-val">72 — Iron and steel</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Heading</span><span class="hts-val">7206 — Iron/non-alloy steel, ingots &amp; primary forms</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Subheading</span><span class="hts-val">7206.10 — Ingots</span></div>
+          <div class="hts-detail-row"><span class="hts-key">MFN base duty</span><span class="hts-val">Free</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 232</span><span class="hts-val">50% on full value (Annex I-A)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 122</span><span class="hts-val">Exempt (anti-stacking)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Notes</span><span class="hts-val">Alloy steel ingots → 7224.10. Stainless steel ingots → 7218.10. Australian imports exempt from Sec. 232.</span></div>
+        </div>
+      </div>
+
+      <div class="hts-card">
+        <div class="hts-card-header">
+          <div class="hts-num">9405.42</div>
+          <span class="rt warn">Sec. 232 Derivative — 25%</span>
+        </div>
+        <div class="hts-card-title">Aluminum with LED Lighting (LED luminaires)</div>
+        <div class="hts-card-body">
+          <div class="hts-detail-row"><span class="hts-key">Full US code</span><span class="hts-val mono-big">9405.42.xx</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Chapter</span><span class="hts-val">94 — Furniture; lamps and lighting fittings</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Heading</span><span class="hts-val">9405 — Luminaires and lighting fittings</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Subheading</span><span class="hts-val">9405.42 — Designed for LED light sources</span></div>
+          <div class="hts-detail-row"><span class="hts-key">MFN base duty</span><span class="hts-val">3.5%</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 232</span><span class="hts-val">25% derivative (Ch. 94 added Aug 2025)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 301 (China)</span><span class="hts-val">7.5% minimum on electrical goods</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Notes</span><span class="hts-val">LED bulbs/lamps without housing → 8539.52. Classification as 9405 vs 8539 depends on whether it is a complete fixture or just a lamp.</span></div>
+        </div>
+      </div>
+
+      <div class="hts-card">
+        <div class="hts-card-header">
+          <div class="hts-num">7616.99 / 8302</div>
+          <span class="rt warn">Sec. 232 Derivative — tiered</span>
+        </div>
+        <div class="hts-card-title">Aluminum + Plastic + Steel Components (mixed)</div>
+        <div class="hts-card-body">
+          <div class="hts-detail-row"><span class="hts-key">Primary codes</span><span class="hts-val mono-big">7616.99 / 8302.xx</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Chapter</span><span class="hts-val">76 — Aluminum articles; or 83 — Misc. metal articles</span></div>
+          <div class="hts-detail-row"><span class="hts-key">7616.99</span><span class="hts-val">Other aluminum articles not elsewhere classified</span></div>
+          <div class="hts-detail-row"><span class="hts-key">8302.xx</span><span class="hts-val">Base metal mountings, fittings, and similar articles</span></div>
+          <div class="hts-detail-row"><span class="hts-key">MFN base duty</span><span class="hts-val">~3% (varies by subheading)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 232 (≥50% metal)</span><span class="hts-val">25% on full value (Annex I-B)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Section 232 (15–49% metal)</span><span class="hts-val">Combined 15% min (Annex III, thru 2027)</span></div>
+          <div class="hts-detail-row"><span class="hts-key">Notes</span><span class="hts-val">Exact classification depends on primary function and material composition. Consult a customs broker for binding ruling.</span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tab-footnote">HTS codes are administered by the US International Trade Commission (USITC). 10-digit codes mandatory for all US imports as of September 2025. Always verify classification with a licensed customs broker before import.</div>
+  </div>
+</div>
+
+<!-- ═══════════ POLICY TIMELINE TAB ═══════════ -->
+<div class="tab-panel" id="tab-timeline" style="display:none">
+  <div class="tab-content-wrap">
+    <div class="tab-section-title">US Tariff Policy Timeline — 2025–2026</div>
+    <p class="tab-intro">Key legislative and executive actions that shape the current tariff landscape for aluminum and steel imports.</p>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-date">Jan 2025</div>
+        <div class="tl-dot tl-neutral"></div>
+        <div class="tl-content">
+          <div class="tl-title">Baseline MFN tariffs in effect</div>
+          <div class="tl-desc">Standard Most Favored Nation (MFN) rates apply. Effective tariff rate on all imports: 2.3%. Section 301 tariffs (7.5%–100%) on Chinese goods from Trump's first term remain active.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Mar 4, 2025</div>
+        <div class="tl-dot tl-warn"></div>
+        <div class="tl-content">
+          <div class="tl-title">IEEPA fentanyl tariffs — Canada &amp; Mexico</div>
+          <div class="tl-desc">25% tariffs imposed on Canadian and Mexican imports via IEEPA authority, citing fentanyl emergency. USMCA-compliant goods paused/exempted for qualifying shipments.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Mar 12, 2025</div>
+        <div class="tl-dot tl-danger"></div>
+        <div class="tl-content">
+          <div class="tl-title">Section 232 steel &amp; aluminum doubled to 25%</div>
+          <div class="tl-desc">Proclamations 10895 &amp; 10896 raise Section 232 steel and aluminum tariffs from prior rates to 25% on all imports, with no country exemptions remaining.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Apr 2, 2025</div>
+        <div class="tl-dot tl-danger"></div>
+        <div class="tl-content">
+          <div class="tl-title">"Liberation Day" — IEEPA reciprocal tariffs announced</div>
+          <div class="tl-desc">Executive order announces country-specific reciprocal tariffs for 60+ nations ranging from 10% to 49% (China eventually reaching 145%). Described as the largest unilateral tariff action since Smoot-Hawley (1930).</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Apr 9, 2025</div>
+        <div class="tl-dot tl-warn"></div>
+        <div class="tl-content">
+          <div class="tl-title">90-day pause — most IEEPA rates rolled back to 10%</div>
+          <div class="tl-desc">All country-specific rates above 10% are paused for 90 days to allow negotiations. Baseline 10% IEEPA tariff takes effect for most countries. China excluded — rates continue escalating.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">May 8, 2025</div>
+        <div class="tl-dot tl-neutral"></div>
+        <div class="tl-content">
+          <div class="tl-title">US–UK bilateral framework deal</div>
+          <div class="tl-desc">Framework agreement reduces UK auto tariffs and provides steel/aluminum quota arrangements. Baseline 10% maintained. UK later receives 25% (vs 50%) rate on steel/aluminum under Proclamation 11021.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">May 12, 2025</div>
+        <div class="tl-dot tl-success"></div>
+        <div class="tl-content">
+          <div class="tl-title">US–China Geneva truce</div>
+          <div class="tl-desc">US reduces IEEPA tariff on China from 125% to 10% for 90 days. China reduces retaliatory tariffs from 125% to 10%. Section 301 tariffs and 20% fentanyl IEEPA tariff remain.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Jun 4, 2025</div>
+        <div class="tl-dot tl-danger"></div>
+        <div class="tl-content">
+          <div class="tl-title">Section 232 steel &amp; aluminum doubled again — to 50%</div>
+          <div class="tl-desc">Steel and aluminum Section 232 tariffs double from 25% to 50% for all countries. UK receives reduced rate. Australia retains bilateral exemption.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Aug 18, 2025</div>
+        <div class="tl-dot tl-warn"></div>
+        <div class="tl-content">
+          <div class="tl-title">407 new HTS codes added to Section 232 derivative scope</div>
+          <div class="tl-desc">Bureau of Industry and Security adds 407 HTSUS codes as Section 232 steel/aluminum derivative products — expanding coverage to Chapters 83, 84, 85, 87, and 94, including lamps and lighting fittings.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Nov 7, 2025</div>
+        <div class="tl-dot tl-success"></div>
+        <div class="tl-content">
+          <div class="tl-title">US–China truce extended one year</div>
+          <div class="tl-desc">China's reduced 10% IEEPA rate extended through November 10, 2026. Section 301 tariffs and Section 232 remain fully in force on Chinese goods.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Feb 20, 2026</div>
+        <div class="tl-dot tl-danger"></div>
+        <div class="tl-content">
+          <div class="tl-title">Supreme Court strikes down all IEEPA tariffs</div>
+          <div class="tl-desc"><em>Learning Resources, Inc. v. Trump</em> — Supreme Court rules all IEEPA-based tariffs unconstitutional. ~$130–160B in collected duties subject to potential refund via Court of International Trade.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Feb 24, 2026</div>
+        <div class="tl-dot tl-warn"></div>
+        <div class="tl-content">
+          <div class="tl-title">Section 122 global tariff takes effect</div>
+          <div class="tl-desc">10% temporary import surcharge on all countries under Section 122 of the Trade Act of 1974. Expires automatically ~July 24, 2026 without Congressional extension. Exempt: Sec. 232 goods, USMCA-compliant goods.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Apr 2, 2026</div>
+        <div class="tl-dot tl-danger"></div>
+        <div class="tl-content">
+          <div class="tl-title">Proclamation 11021 — Section 232 restructured</div>
+          <div class="tl-desc">Major restructuring of Section 232 framework. Tariffs now applied to <strong>full customs value</strong> (not just metal content). New tiered structure: 50% for primary metals, 25% for substantially metal derivatives, 15% combined minimum for metal-intensive industrial goods through Dec 2027.</div>
+        </div>
+      </div>
+
+      <div class="tl-item tl-current">
+        <div class="tl-date">May 2026</div>
+        <div class="tl-dot tl-current-dot"></div>
+        <div class="tl-content">
+          <div class="tl-title">Current regime — as of this calculator</div>
+          <div class="tl-desc">Section 232 (50%/25%/15% tiered) + Section 301 on China + Section 122 (10%, expiring ~Jul 24) + MFN base duties. Congressional action pending on replacement tariff authority. Refund proceedings ongoing at Court of International Trade.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="tab-footnote">Sources: White House proclamations, Congressional Research Service, Yale Budget Lab, Tax Foundation Tariff Tracker, HSRates.com, US CBP. Updated May 2026.</div>
+  </div>
+</div>
+
+<!-- ═══════════ NEARSHORING CALCULATOR TAB ═══════════ -->
+<div class="tab-panel" id="tab-nearshore" style="display:none">
+  <div class="ns-wrap">
+    <div class="tab-section-title">Nearshoring Calculator</div>
+    <p class="tab-intro">Model a two-leg supply chain: raw materials ship from an Asia-Pacific country into Mexico, undergo transformation with printed fabric materials, then export to the USA. Compare total landed cost vs. direct import.</p>
+
+    <!-- Flow diagram -->
+    <div class="ns-flow" id="ns-flow">
+
+      <!-- Origin -->
+      <div class="ns-node">
+        <div class="ns-node-badge">① Origin</div>
+        <div class="ns-node-flag"><span class="fi fi-cn ns-flag-icon" id="flow-flag-img"></span></div>
+        <div class="ns-node-name" id="flow-country">China</div>
+        <div class="ns-node-sub">Raw materials</div>
+      </div>
+
+      <!-- Arrow 1 -->
+      <div class="ns-arrow">
+        <div class="ns-arrow-line">
+          <div class="ns-arrow-dash"></div>
+          <div class="ns-arrow-head"></div>
+        </div>
+        <div class="ns-arrow-label">Leg 1</div>
+      </div>
+
+      <!-- Transformation -->
+      <div class="ns-node mx-node" id="flow-transform-node">
+        <div class="ns-node-badge">② Transform</div>
+        <div class="ns-node-flag"><span class="fi fi-mx ns-flag-icon" id="flow-transform-flag"></span></div>
+        <div class="ns-node-name" id="flow-transform-name">Mexico</div>
+        <div class="ns-node-sub">+ Value add</div>
+      </div>
+
+      <!-- Arrow 2 -->
+      <div class="ns-arrow">
+        <div class="ns-arrow-line">
+          <div class="ns-arrow-dash"></div>
+          <div class="ns-arrow-head"></div>
+        </div>
+        <div class="ns-arrow-label">Leg 2</div>
+      </div>
+
+      <!-- Destination -->
+      <div class="ns-node us-node">
+        <div class="ns-node-badge">③ Destination</div>
+        <div class="ns-node-flag"><span class="fi fi-us ns-flag-icon"></span></div>
+        <div class="ns-node-name">United States</div>
+        <div class="ns-node-sub">Final import</div>
+      </div>
+
+    </div>
+
+    <!-- Input cards -->
+    <div class="ns-grid">
+
+      <!-- Leg 1: APAC → Transformation Country -->
+      <div class="ns-card">
+        <div class="ns-card-header leg1" id="ns-leg1-header">
+          <span class="fi fi-cn ns-card-header-flag" id="ns-leg1-flag"></span>
+          <div class="ns-card-header-text">
+            <div class="ns-card-header-step">① Origin</div>
+            <div class="ns-card-header-title" id="ns-leg1-title">China → Transformation</div>
+          </div>
+        </div>
+        <div class="ns-card-body">
+          <div class="ns-field">
+            <label>Country of Origin</label>
+            <div class="flag-display">
+              <span class="fi fi-cn flag-icon-display" id="flag-img-ns"></span>
+              <span class="flag-label" id="flag-label-ns">China</span>
+              <span class="flag-label-sub" id="flag-region-ns">East Asia</span>
+            </div>
+            <select id="ns-country">
+              <optgroup label="── East Asia ──">
+                <option value="china">🇨🇳 China</option>
+                <option value="japan">🇯🇵 Japan</option>
+                <option value="south_korea">🇰🇷 South Korea</option>
+                <option value="taiwan">🇹🇼 Taiwan</option>
+                <option value="hong_kong">🇭🇰 Hong Kong</option>
+                <option value="mongolia">🇲🇳 Mongolia</option>
+              </optgroup>
+              <optgroup label="── Southeast Asia ──">
+                <option value="vietnam">🇻🇳 Vietnam</option>
+                <option value="thailand">🇹🇭 Thailand</option>
+                <option value="indonesia">🇮🇩 Indonesia</option>
+                <option value="malaysia">🇲🇾 Malaysia</option>
+                <option value="philippines">🇵🇭 Philippines</option>
+                <option value="singapore">🇸🇬 Singapore</option>
+                <option value="cambodia">🇰🇭 Cambodia</option>
+                <option value="myanmar">🇲🇲 Myanmar</option>
+                <option value="laos">🇱🇦 Laos</option>
+              </optgroup>
+              <optgroup label="── South Asia ──">
+                <option value="india">🇮🇳 India</option>
+                <option value="bangladesh">🇧🇩 Bangladesh</option>
+                <option value="pakistan">🇵🇰 Pakistan</option>
+                <option value="sri_lanka">🇱🇰 Sri Lanka</option>
+              </optgroup>
+              <optgroup label="── Oceania ──">
+                <option value="australia">🇦🇺 Australia</option>
+                <option value="new_zealand">🇳🇿 New Zealand</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="ns-field">
+            <label>Raw material product</label>
+            <select id="ns-product">
+              <option value="raw_al">Raw Aluminum (7601.10)</option>
+              <option value="raw_steel">Raw Steel (7206.10)</option>
+              <option value="al_led">Aluminum + LED (9405.42)</option>
+              <option value="mixed">Aluminum + Plastic + Steel (7616.99)</option>
+              <option value="print_graphics">Printed Graphics — fabric / vinyl (4911.91 / 5907.00)</option>
+            </select>
+          </div>
+          <div class="ns-field">
+            <label>Raw material value (USD)</label>
+            <input type="number" id="ns-mat-value" value="5000" min="0" step="100">
+            <div class="ns-hint" id="ns-leg1-hint">FOB value of goods shipped to transformation country</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leg 2: Transformation Country -->
+      <div class="ns-card">
+        <div class="ns-card-header leg2" id="ns-leg2-header">
+          <span class="fi fi-mx ns-card-header-flag" id="ns-leg2-flag"></span>
+          <div class="ns-card-header-text">
+            <div class="ns-card-header-step">② Transformation</div>
+            <div class="ns-card-header-title" id="ns-leg2-title">Mexico — Transformation</div>
+          </div>
+        </div>
+        <div class="ns-card-body">
+          <div class="ns-field">
+            <label>Transformation Country</label>
+            <div class="flag-display">
+              <span class="fi fi-mx flag-icon-display" id="flag-img-transform"></span>
+              <span class="flag-label" id="flag-label-transform">Mexico</span>
+              <span class="flag-label-sub" id="flag-fta-transform">USMCA</span>
+            </div>
+            <select id="ns-transform-country">
+              <optgroup label="── Americas — USMCA ──">
+                <option value="mexico" selected>🇲🇽 Mexico</option>
+                <option value="canada">🇨🇦 Canada</option>
+              </optgroup>
+              <optgroup label="── Americas — FTA ──">
+                <option value="colombia">🇨🇴 Colombia</option>
+                <option value="peru">🇵🇪 Peru</option>
+                <option value="chile">🇨🇱 Chile</option>
+                <option value="costa_rica">🇨🇷 Costa Rica</option>
+                <option value="dominican_republic">🇩🇴 Dominican Republic</option>
+                <option value="panama">🇵🇦 Panama</option>
+              </optgroup>
+              <optgroup label="── Middle East / Africa — FTA ──">
+                <option value="israel">🇮🇱 Israel</option>
+                <option value="jordan">🇯🇴 Jordan</option>
+                <option value="morocco">🇲🇦 Morocco</option>
+              </optgroup>
+              <optgroup label="── Asia-Pacific — FTA ──">
+                <option value="australia_t">🇦🇺 Australia</option>
+                <option value="singapore_t">🇸🇬 Singapore</option>
+                <option value="south_korea_t">🇰🇷 South Korea</option>
+              </optgroup>
+              <optgroup label="── Europe — No FTA ──">
+                <option value="germany">🇩🇪 Germany</option>
+                <option value="ireland">🇮🇪 Ireland</option>
+                <option value="poland">🇵🇱 Poland</option>
+                <option value="turkey">🇹🇷 Turkey</option>
+                <option value="portugal">🇵🇹 Portugal</option>
+              </optgroup>
+              <optgroup label="── Asia — No FTA ──">
+                <option value="vietnam_t">🇻🇳 Vietnam</option>
+                <option value="thailand_t">🇹🇭 Thailand</option>
+                <option value="indonesia_t">🇮🇩 Indonesia</option>
+                <option value="malaysia_t">🇲🇾 Malaysia</option>
+                <option value="india_t">🇮🇳 India</option>
+                <option value="philippines_t">🇵🇭 Philippines</option>
+                <option value="bangladesh_t">🇧🇩 Bangladesh</option>
+                <option value="cambodia_t">🇰🇭 Cambodia</option>
+                <option value="taiwan_t">🇹🇼 Taiwan</option>
+                <option value="japan_t">🇯🇵 Japan</option>
+                <option value="china_t">🇨🇳 China</option>
+              </optgroup>
+              <optgroup label="── Africa — No FTA ──">
+                <option value="south_africa">🇿🇦 South Africa</option>
+                <option value="egypt">🇪🇬 Egypt</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="ns-field">
+            <label>Printed fabric / material cost (USD)</label>
+            <input type="number" id="ns-fabric-value" value="1500" min="0" step="100">
+            <div class="ns-hint" id="ns-fabric-hint">Cost of materials added in transformation country</div>
+          </div>
+          <div class="ns-field">
+            <label>Labor &amp; overhead (USD)</label>
+            <input type="number" id="ns-labor-value" value="800" min="0" step="50">
+            <div class="ns-hint">Assembly, finishing, and factory overhead</div>
+          </div>
+          <div class="ns-field">
+            <label>Finished product HTS (→ USA)</label>
+            <select id="ns-finished-hts">
+              <option value="6307">6307.90 — Made-up textile articles (fabric dominant)</option>
+              <option value="9403">9403.10 — Metal furniture with fabric upholstery</option>
+              <option value="6211">6211.xx — Garments / fabric goods with frame</option>
+              <option value="7616">7616.99 — Aluminum article with fabric trim</option>
+            </select>
+            <div class="ns-hint">Classification of finished good exported to USA</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leg 3: Transformation Country → USA -->
+      <div class="ns-card">
+        <div class="ns-card-header leg3" id="ns-leg3-header">
+          <span class="fi fi-us ns-card-header-flag"></span>
+          <div class="ns-card-header-text">
+            <div class="ns-card-header-step">③ Destination</div>
+            <div class="ns-card-header-title" id="ns-leg3-title">→ United States</div>
+          </div>
+        </div>
+        <div class="ns-card-body">
+          <div class="ns-field">
+            <label>Quantity of finished units</label>
+            <input type="number" id="ns-qty" value="1" min="1">
+          </div>
+          <div class="ns-field" id="ns-fta-field">
+            <label id="ns-fta-label">FTA / trade agreement certification</label>
+            <select id="ns-usmca">
+              <option value="claimed">Claimed — tariff shift + RVC met</option>
+              <option value="borderline">Borderline — RVC near threshold</option>
+              <option value="not_claimed">Not claimed / does not qualify</option>
+            </select>
+            <div class="ns-hint" id="ns-fta-hint">USMCA requires ≥60% Regional Value Content and a tariff classification shift</div>
+          </div>
+          <div class="ns-field">
+            <label>Section 232 on metal content?</label>
+            <select id="ns-sec232">
+              <option value="yes">Yes — metal is not US-smelted/poured</option>
+              <option value="no">No — metal certified as US-origin</option>
+            </select>
+            <div class="ns-hint" id="ns-sec232-hint">Sec. 232 applies even on FTA goods if aluminum/steel was not smelted in the USA</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Results -->
+    <div class="ns-results">
+      <div class="ns-results-header">
+        <div>
+          <div class="ns-results-label">Total Nearshore Landed Cost</div>
+          <div class="ns-results-total" id="ns-total-landed">$0.00</div>
+        </div>
+        <div class="ns-vs">
+          <div class="ns-vs-item">
+            <div class="vl">Total tariffs paid</div>
+            <div class="vv" id="ns-total-tariff">$0.00</div>
+          </div>
+          <div class="ns-vs-item">
+            <div class="vl">vs. direct import</div>
+            <div class="vv" id="ns-vs-direct">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="ns-legs">
+        <div class="ns-leg">
+          <div class="ns-leg-label">① APAC → Mexico</div>
+          <div id="ns-leg1-rows"></div>
+        </div>
+        <div class="ns-leg">
+          <div class="ns-leg-label">② Mexico factory</div>
+          <div id="ns-leg2-rows"></div>
+        </div>
+        <div class="ns-leg">
+          <div class="ns-leg-label">③ Mexico → USA</div>
+          <div id="ns-leg3-rows"></div>
+        </div>
+      </div>
+      <div class="usmca-bar" id="ns-usmca-bar">
+        <span class="usmca-icon"></span>
+        <span id="ns-usmca-text"></span>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="ns-compare">
+      <div class="ns-compare-header">Route comparison — per unit</div>
+      <div class="ns-compare-grid">
+        <div class="ns-compare-col">
+          <div class="ns-compare-col-title">🔄 Nearshore via Mexico</div>
+          <div id="ns-col-near"></div>
+        </div>
+        <div class="ns-compare-col">
+          <div class="ns-compare-col-title">✈️ Direct APAC → USA</div>
+          <div id="ns-col-direct"></div>
+        </div>
+      </div>
+      <div class="ns-total-row">
+        <span>Nearshore total: <span id="ns-near-total-label">—</span></span>
+        <span>Direct total: <span id="ns-direct-total-label">—</span></span>
+      </div>
+    </div>
+
+    <div class="tab-footnote">Mexico import tariff rates are approximate MFN rates. Mexico-Japan EPA and other FTAs may reduce Leg 1 tariffs. USMCA qualification requires a valid Certificate of Origin and adherence to product-specific rules of origin. Section 232 on metal content applies even to USMCA goods unless the aluminum/steel was smelted and cast in the USA, Canada, or Mexico from domestic ore. Consult a licensed customs broker for binding classification and RVC calculations.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="disclaimer">
+    <span class="disclaimer-icon">⚠</span>
+    <span>
+      <strong style="color:var(--text-muted)">For informational purposes only.</strong>
+      Tariff rates reflect publicly available policy data as of May 2026, including Proclamation 11021 (April 2, 2026) restructuring Section 232 tariffs. Actual duties depend on precise HTS classification, product composition, and origin documentation. Rates are subject to change without notice.
+      Consult a licensed customs broker or trade attorney before making import decisions.
+    </span>
+  </div>
+</footer>
+
+<script>
+const ITEMS = [
+  { id: 0, type: 'raw_al',         mfn: 0.025 },
+  { id: 1, type: 'raw_steel',      mfn: 0.00  },
+  { id: 2, type: 'al_led',         mfn: 0.035 },
+  { id: 3, type: 'mixed',          mfn: 0.03  },
+  { id: 4, type: 'print_graphics', mfn: 0.037 },
+];
+
+let selItem = 0;
+
+function fmt(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+function tag(text, cls) { return `<span class="tag tag-${cls}">${text}</span>`; }
+function mono(text) { return `<span class="mono">${text}</span>`; }
+
+// ── API Key management ──
+let _apiKey = localStorage.getItem('anthropic_api_key') || '';
+
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (val) {
+    _apiKey = val;
+    localStorage.setItem('anthropic_api_key', val);
+    document.getElementById('api-status').textContent = '✓ Key saved';
+    document.getElementById('api-status').className = 'api-status ok';
+    document.getElementById('api-key-input').value = '•'.repeat(Math.min(val.length, 24));
+  }
+}
+
+function getApiHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    ...(( _apiKey ) ? { 'x-api-key': _apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' } : {})
+  };
+}
+
+function checkApiKey() {
+  const stored = localStorage.getItem('anthropic_api_key');
+  if (stored) {
+    _apiKey = stored;
+    document.getElementById('api-key-input').value = '•'.repeat(Math.min(stored.length, 24));
+    document.getElementById('api-status').textContent = '✓ Key loaded';
+    document.getElementById('api-status').className = 'api-status ok';
+  }
+}
+
+// Allow Enter key to save
+document.getElementById('api-key-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveApiKey();
+});
+
+checkApiKey();
+function switchTab(targetId) {
+  ['calculator','nearshore','rates','hts','timeline'].forEach(id => {
+    const p = document.getElementById('tab-' + id);
+    if (p) p.style.display = id === targetId ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === targetId);
+  });
+}
+
+document.querySelectorAll('.nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+document.getElementById('item-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.item-card');
+  if (!btn) return;
+  selItem = parseInt(btn.dataset.id);
+  document.querySelectorAll('.item-card').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('metal-pct-field').style.display = selItem === 3 ? 'block' : 'none';
+  calc();
+});
+
+['country','value','qty','metal-pct'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.addEventListener('input', calc); el.addEventListener('change', calc); }
+});
+
+function calc() {
+  const item = ITEMS[selItem];
+  const countryKey = document.getElementById('country').value;
+  const val = parseFloat(document.getElementById('value').value) || 0;
+  const qty = parseInt(document.getElementById('qty').value) || 1;
+  const metalPct = parseFloat(document.getElementById('metal-pct').value) || 40;
+  const total = val * qty;
+
+  const isChina = countryKey === 'china';
+  const isAustralia = countryKey === 'australia';
+  const mfnAmt = total * item.mfn;
+
+  let rows = [], tariff = 0, note = '';
+
+  if (item.type === 'raw_al') {
+    const s232Rate = isAustralia ? 0 : 0.50;
+    const s232Amt = total * s232Rate;
+    rows = [
+      { label: 'Item value (total)', val: fmt(total) },
+      { label: `MFN base duty ${mono('7601.10')}`, val: `${fmt(mfnAmt)} ${tag('2.5%','info')}` },
+      { label: 'Section 232 — raw aluminum', val: isAustralia ? `Exempt ${tag('0%','success')}` : `${fmt(s232Amt)} ${tag('50%','danger')}` },
+      { label: 'Section 122', val: 'Exempt — Sec. 232 anti-stacking' },
+    ];
+    tariff = mfnAmt + s232Amt;
+    note = isAustralia
+      ? 'Australia is exempt from Section 232 aluminum tariffs under a bilateral arrangement. MFN base duty of 2.5% applies.'
+      : `Raw/unwrought aluminum (HTS 7601.10) faces a 50% Section 232 tariff on full customs value as of April 6, 2026 (Proclamation 11021, Annex I-A). Section 122 does not stack on Sec. 232 goods.${isChina ? ' China-origin aluminum may also face anti-dumping/countervailing duties — verify with your customs broker.' : ''}`;
+
+  } else if (item.type === 'raw_steel') {
+    const s232Rate = isAustralia ? 0 : 0.50;
+    const s232Amt = total * s232Rate;
+    rows = [
+      { label: 'Item value (total)', val: fmt(total) },
+      { label: `MFN base duty ${mono('7206.10')}`, val: 'Free' },
+      { label: 'Section 232 — raw steel', val: isAustralia ? `Exempt ${tag('0%','success')}` : `${fmt(s232Amt)} ${tag('50%','danger')}` },
+      { label: 'Section 122', val: 'Exempt — Sec. 232 anti-stacking' },
+    ];
+    tariff = s232Amt;
+    note = isAustralia
+      ? 'Australia is exempt from Section 232 steel tariffs under a bilateral arrangement. No MFN base duty applies to raw steel ingots.'
+      : `Raw steel ingots (HTS 7206.10) carry a 0% MFN duty but face a 50% Section 232 tariff on full customs value as of April 6, 2026.${isChina ? ' China-origin steel may face additional Section 301 surcharges — verify specific rates with your customs broker.' : ''}`;
+
+  } else if (item.type === 'al_led') {
+    const s232Amt = total * 0.25;
+    const s301 = isChina ? total * 0.075 : 0;
+    rows = [
+      { label: 'Item value (total)', val: fmt(total) },
+      { label: `MFN base duty ${mono('9405.42')}`, val: `${fmt(mfnAmt)} ${tag('3.5%','info')}` },
+      { label: 'Section 232 derivative (aluminum housing)', val: `${fmt(s232Amt)} ${tag('25%','warn')}` },
+    ];
+    if (isChina) rows.push({ label: 'Section 301 — China (LED/electrical)', val: `${fmt(s301)} ${tag('7.5%','warn')}` });
+    rows.push({ label: 'Section 122', val: 'Exempt — Sec. 232 anti-stacking' });
+    tariff = mfnAmt + s232Amt + s301;
+    note = `LED luminaires with aluminum housing (HTS 9405.42) are Section 232 aluminum derivative products per the Aug 2025 expansion covering Chapter 94 goods. A 25% derivative tariff applies to full customs value. MFN base duty of 3.5% stacks separately.${isChina ? ' Chinese-origin fixtures additionally face Section 301 tariffs (minimum 7.5% on electrical goods).' : ''}`;
+
+  } else if (item.type === 'mixed') {
+    const metalVal = total * (metalPct / 100);
+    let s232Amt = 0, s122 = 0, s301 = 0;
+    let s232Display = '', s232Note = '';
+
+    if (metalPct >= 50) {
+      s232Amt = Math.max(total * 0.25 - mfnAmt, 0);
+      s232Display = `${fmt(s232Amt)} ${tag('25% derivative','warn')}`;
+      s232Note = 'Metal ≥50% of value → classified as substantially metal derivative (Annex I-B), 25% on full value.';
+    } else if (metalPct >= 15) {
+      s232Amt = Math.max(total * 0.15 - mfnAmt, 0);
+      s232Display = `${fmt(s232Amt)} ${tag('15% combined min','warn')}`;
+      s232Note = 'Metal 15–49% of value → Annex III temporary reduction, combined floor of 15% through Dec 31, 2027.';
+    } else {
+      s122 = total * 0.10;
+      if (isChina) s301 = total * 0.075;
+      s232Display = tag('Likely exempt','success');
+      s232Note = 'Metal <15% of value → likely outside Sec. 232 derivative scope; Section 122 (10%) applies instead.';
+    }
+
+    rows = [
+      { label: 'Item value (total)', val: fmt(total) },
+      { label: 'Metal content (estimated)', val: `${fmt(metalVal)} ${tag(metalPct + '%','info')}` },
+      { label: `MFN base duty ${mono('7616.99')}`, val: `${fmt(mfnAmt)} ${tag('3%','info')}` },
+      { label: 'Section 232 (mixed derivative)', val: s232Display },
+    ];
+    if (metalPct < 15) {
+      rows.push({ label: 'Section 122 — global baseline', val: `${fmt(s122)} ${tag('10%','warn')}` });
+      if (isChina) rows.push({ label: 'Section 301 — China', val: `${fmt(s301)} ${tag('7.5%','warn')}` });
+    } else {
+      rows.push({ label: 'Section 122', val: 'Exempt — Sec. 232 applies' });
+    }
+    tariff = mfnAmt + s232Amt + s122 + s301;
+    note = s232Note + ' Adjust the Metal % field to model different product compositions. April 2026 Proclamation 11021 applies Section 232 tariffs to full entered value for derivative products.';
+
+  } else if (item.type === 'print_graphics') {
+    // Printed graphics: no Section 232 (not a metal product)
+    // MFN varies: 5907.00 textile fabric 3.7%, 3919.90 adhesive vinyl 4.8%, 4911.91 printed pictures free
+    // Use blended 3.7% as default; Sec 122 (10%) applies; China gets Sec 301
+    const s122 = total * 0.10;
+    const s301 = isChina ? total * 0.075 : 0;
+
+    // Sub-type rates for informational breakdown
+    const fabricMfn  = total * 0.037;  // 5907.00 printed textile
+    const vinylMfn   = total * 0.048;  // 3919.90 adhesive film
+    const printedMfn = 0;              // 4911.91 printed pictures = free
+
+    rows = [
+      { label: 'Item value (total)', val: fmt(total) },
+      { label: `MFN — printed textile fabric ${mono('5907.00')}`,   val: `${fmt(fabricMfn)} ${tag('3.7%','info')}` },
+      { label: `MFN — adhesive vinyl/film ${mono('3919.90')}`,       val: `${fmt(vinylMfn)}  ${tag('4.8%','info')}` },
+      { label: `MFN — printed pictures/designs ${mono('4911.91')}`,  val: `Free ${tag('0%','success')}` },
+      { label: 'Section 232', val: `Not applicable ${tag('exempt','success')}` },
+      { label: 'Section 122 — global baseline', val: `${fmt(s122)} ${tag('10%','warn')}` },
+    ];
+    if (isChina) rows.push({ label: 'Section 301 — China (printed goods)', val: `${fmt(s301)} ${tag('7.5%','warn')}` });
+
+    tariff = mfnAmt + s122 + s301; // mfnAmt uses blended 3.7%
+    note = `Printed graphics span three HTS codes depending on substrate and use. Printed textile fabrics (5907.00) carry a 3.7% MFN duty; adhesive vinyl/film graphics (3919.90) are 4.8%; pure printed pictures and designs (4911.91) enter duty-free. All are subject to the Section 122 10% global baseline (not exempt — no Sec. 232 applies). ${isChina ? 'Chinese-origin printed goods face an additional 7.5% Section 301 tariff minimum. Some printed advertising materials from China may face higher rates up to 25% depending on specific HS subheading — verify with your broker.' : 'Section 301 does not apply for non-China origins.'} MFN amount above uses the 3.7% printed textile rate as a baseline estimate.`;
+  }
+
+  const effRate = total > 0 ? (tariff / total) * 100 : 0;
+  document.getElementById('total-amt').textContent = fmt(tariff);
+  document.getElementById('eff-rate').textContent = fmtPct(effRate);
+  document.getElementById('landed').textContent = fmt(total + tariff);
+
+  document.getElementById('breakdown').innerHTML =
+    `<table style="width:100%;border-collapse:collapse;">` +
+    rows.map(r => `<tr class="bd-row"><td class="bd-label">${r.label}</td><td class="bd-val" style="text-align:right">${r.val}</td></tr>`).join('') +
+    `<tr class="bd-row total"><td class="bd-label">Total tariff estimate</td><td class="bd-val" style="text-align:right">${fmt(tariff)}</td></tr>` +
+    `</table>`;
+
+  const noteBox = document.getElementById('note-box');
+  const noteText = document.getElementById('note-text');
+  noteText.textContent = note;
+  noteBox.style.display = note ? 'block' : 'none';
+}
+
+try { calc(); } catch(e) { console.warn('calc init error:', e); }
+
+// Country display names
+const COUNTRY_FLAGS = {
+  china:'🇨🇳', japan:'🇯🇵', south_korea:'🇰🇷', taiwan:'🇹🇼', hong_kong:'🇭🇰', mongolia:'🇲🇳',
+  vietnam:'🇻🇳', thailand:'🇹🇭', indonesia:'🇮🇩', malaysia:'🇲🇾', philippines:'🇵🇭', singapore:'🇸🇬',
+  cambodia:'🇰🇭', myanmar:'🇲🇲', laos:'🇱🇦', brunei:'🇧🇳', timor_leste:'🇹🇱',
+  india:'🇮🇳', bangladesh:'🇧🇩', pakistan:'🇵🇰', sri_lanka:'🇱🇰', nepal:'🇳🇵', bhutan:'🇧🇹', maldives:'🇲🇻',
+  kazakhstan:'🇰🇿', uzbekistan:'🇺🇿', kyrgyzstan:'🇰🇬', tajikistan:'🇹🇯', turkmenistan:'🇹🇲', afghanistan:'🇦🇫',
+  australia:'🇦🇺', new_zealand:'🇳🇿', papua_new_guinea:'🇵🇬', fiji:'🇫🇯', solomon_islands:'🇸🇧',
+  vanuatu:'🇻🇺', samoa:'🇼🇸', tonga:'🇹🇴', kiribati:'🇰🇮', micronesia:'🇫🇲',
+  palau:'🇵🇼', marshall_islands:'🇲🇭', nauru:'🇳🇷', tuvalu:'🇹🇻',
+};
+
+const COUNTRY_CODES = {
+  china:'cn', japan:'jp', south_korea:'kr', taiwan:'tw', hong_kong:'hk', mongolia:'mn',
+  vietnam:'vn', thailand:'th', indonesia:'id', malaysia:'my', philippines:'ph', singapore:'sg',
+  cambodia:'kh', myanmar:'mm', laos:'la', brunei:'bn', timor_leste:'tl',
+  india:'in', bangladesh:'bd', pakistan:'pk', sri_lanka:'lk', nepal:'np', bhutan:'bt', maldives:'mv',
+  kazakhstan:'kz', uzbekistan:'uz', kyrgyzstan:'kg', tajikistan:'tj', turkmenistan:'tm', afghanistan:'af',
+  australia:'au', new_zealand:'nz', papua_new_guinea:'pg', fiji:'fj', solomon_islands:'sb',
+  vanuatu:'vu', samoa:'ws', tonga:'to', kiribati:'ki', micronesia:'fm',
+  palau:'pw', marshall_islands:'mh', nauru:'nr', tuvalu:'tv',
+};
+
+const COUNTRY_REGIONS = {
+  china:'East Asia', japan:'East Asia', south_korea:'East Asia', taiwan:'East Asia', hong_kong:'East Asia', mongolia:'East Asia',
+  vietnam:'Southeast Asia', thailand:'Southeast Asia', indonesia:'Southeast Asia', malaysia:'Southeast Asia', philippines:'Southeast Asia',
+  singapore:'Southeast Asia', cambodia:'Southeast Asia', myanmar:'Southeast Asia', laos:'Southeast Asia', brunei:'Southeast Asia', timor_leste:'Southeast Asia',
+  india:'South Asia', bangladesh:'South Asia', pakistan:'South Asia', sri_lanka:'South Asia', nepal:'South Asia', bhutan:'South Asia', maldives:'South Asia',
+  kazakhstan:'Central Asia', uzbekistan:'Central Asia', kyrgyzstan:'Central Asia', tajikistan:'Central Asia', turkmenistan:'Central Asia', afghanistan:'Central Asia',
+  australia:'Oceania', new_zealand:'Oceania', papua_new_guinea:'Oceania', fiji:'Oceania', solomon_islands:'Oceania',
+  vanuatu:'Oceania', samoa:'Oceania', tonga:'Oceania', kiribati:'Oceania', micronesia:'Oceania',
+  palau:'Oceania', marshall_islands:'Oceania', nauru:'Oceania', tuvalu:'Oceania',
+};
+
+function flagUrl(key) {
+  const code = COUNTRY_CODES[key];
+  return code ? `https://flagcdn.com/w40/${code}.png` : '';
+}
+
+function updateFlagDisplay(countryKey, spanId, labelId, regionId) {
+  const name = COUNTRY_NAMES[countryKey] || countryKey;
+  const code = COUNTRY_CODES[countryKey] || 'un';
+  const spanEl = document.getElementById(spanId);
+  const lbl    = document.getElementById(labelId);
+  const reg    = document.getElementById(regionId);
+  if (spanEl) spanEl.className = `fi fi-${code} flag-icon-display`;
+  if (lbl) lbl.textContent = name;
+  if (reg) reg.textContent = COUNTRY_REGIONS[countryKey] || '';
+}
+
+const COUNTRY_NAMES = {
+  china:'China', japan:'Japan', south_korea:'South Korea', taiwan:'Taiwan',
+  hong_kong:'Hong Kong', mongolia:'Mongolia', vietnam:'Vietnam', thailand:'Thailand',
+  indonesia:'Indonesia', malaysia:'Malaysia', philippines:'Philippines', singapore:'Singapore',
+  cambodia:'Cambodia', myanmar:'Myanmar', laos:'Laos', brunei:'Brunei',
+  timor_leste:'Timor-Leste', india:'India', bangladesh:'Bangladesh', pakistan:'Pakistan',
+  sri_lanka:'Sri Lanka', nepal:'Nepal', bhutan:'Bhutan', maldives:'Maldives',
+  kazakhstan:'Kazakhstan', uzbekistan:'Uzbekistan', kyrgyzstan:'Kyrgyzstan',
+  tajikistan:'Tajikistan', turkmenistan:'Turkmenistan', afghanistan:'Afghanistan',
+  australia:'Australia', new_zealand:'New Zealand', papua_new_guinea:'Papua New Guinea',
+  fiji:'Fiji', solomon_islands:'Solomon Islands', vanuatu:'Vanuatu', samoa:'Samoa',
+  tonga:'Tonga', kiribati:'Kiribati', micronesia:'Micronesia', palau:'Palau',
+  marshall_islands:'Marshall Islands', nauru:'Nauru', tuvalu:'Tuvalu',
+};
+
+const ITEM_NAMES = [
+  'Raw Aluminum (HTS 7601.10)',
+  'Raw Steel ingots (HTS 7206.10)',
+  'Aluminum with LED Lighting (HTS 9405.42)',
+  'Aluminum + Plastic + Steel components (HTS 7616.99)',
+  'Printed Graphics — fabric / vinyl (HTS 4911.91 / 5907.00)',
+];
+
+// Update context bar whenever calc runs
+const _origCalc = calc;
+function calcAndSync() {
+  _origCalc();
+  const country = document.getElementById('country').value;
+  const rate = document.getElementById('eff-rate').textContent;
+  const flag = COUNTRY_FLAGS[country] || '';
+  document.getElementById('ctx-country').textContent = flag + ' ' + (COUNTRY_NAMES[country] || country);
+  updateFlagDisplay(country, 'flag-img-main', 'flag-label-main', 'flag-region-main');
+  document.getElementById('ctx-product').textContent = ITEM_NAMES[selItem];
+  document.getElementById('ctx-rate').textContent = rate;
+}
+
+// Re-wire all listeners to use calcAndSync
+['country','value','qty','metal-pct'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.removeEventListener('input', calc);
+  el.removeEventListener('change', calc);
+  el.addEventListener('input', calcAndSync);
+  el.addEventListener('change', calcAndSync);
+});
+
+document.getElementById('item-grid').addEventListener('click', () => setTimeout(calcAndSync, 0));
+try { calcAndSync(); } catch(e) { console.warn('calcAndSync init error:', e); }
+
+async function runAnalysis() {
+  const country = document.getElementById('country').value;
+  const countryName = COUNTRY_NAMES[country] || country;
+  const product = ITEM_NAMES[selItem];
+  const effRate = document.getElementById('eff-rate').textContent;
+  const tariff = document.getElementById('total-amt').textContent;
+
+  const btn = document.getElementById('ai-btn');
+  btn.disabled = true;
+  btn.textContent = 'Analyzing…';
+
+  document.getElementById('ai-idle').style.display = 'none';
+  document.getElementById('ai-results').style.display = 'none';
+  const loading = document.getElementById('ai-loading');
+  loading.style.display = 'flex';
+
+  const loadingMessages = [
+    'Analyzing trade relationships…',
+    'Evaluating manufacturing capacity…',
+    'Assessing geopolitical risk…',
+    'Compiling sourcing factors…',
+  ];
+  let msgIdx = 0;
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % loadingMessages.length;
+    document.getElementById('ai-loading-text').textContent = loadingMessages[msgIdx];
+  }, 1800);
+
+  const prompt = `You are a senior international trade and supply chain analyst. A US importer is considering sourcing the following product from the specified country.
+
+Product: ${product}
+Country of origin: ${countryName}
+Current US import tariff (effective rate): ${effRate}
+Estimated tariff on this shipment: ${tariff}
+
+Provide a structured analysis of the PROS and CONS of sourcing this specific product from ${countryName} for a US importer. Consider: tariff exposure and trade risk, manufacturing quality and capacity, supply chain reliability, geopolitical stability, logistics and lead times, labor costs, intellectual property risk, currency risk, and any country-specific trade advantages or disadvantages.
+
+Respond ONLY with a valid JSON object in exactly this format (no markdown, no backticks, no extra text):
+{
+  "pros": [
+    {"label": "Short pro title", "detail": "One sentence explanation."},
+    {"label": "Short pro title", "detail": "One sentence explanation."},
+    {"label": "Short pro title", "detail": "One sentence explanation."},
+    {"label": "Short pro title", "detail": "One sentence explanation."}
+  ],
+  "cons": [
+    {"label": "Short con title", "detail": "One sentence explanation."},
+    {"label": "Short con title", "detail": "One sentence explanation."},
+    {"label": "Short con title", "detail": "One sentence explanation."},
+    {"label": "Short con title", "detail": "One sentence explanation."}
+  ],
+  "summary": "Two sentence overall sourcing verdict for this country and product."
+}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: getApiHeaders(),
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    const data = await response.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    clearInterval(msgInterval);
+    loading.style.display = 'none';
+
+    // Render pros/cons
+    const grid = document.getElementById('pros-cons-grid');
+    grid.innerHTML = `
+      <div class="pros-col">
+        <div class="col-header">✓ Pros</div>
+        <ul class="col-items">
+          ${parsed.pros.map(p => `
+            <li class="col-item">
+              <span class="col-bullet">+</span>
+              <div class="col-item-text">
+                <span class="col-item-label">${p.label}</span>
+                <span class="col-item-desc">${p.detail}</span>
+              </div>
+            </li>`).join('')}
+        </ul>
+      </div>
+      <div class="cons-col">
+        <div class="col-header">✗ Cons</div>
+        <ul class="col-items">
+          ${parsed.cons.map(c => `
+            <li class="col-item">
+              <span class="col-bullet">−</span>
+              <div class="col-item-text">
+                <span class="col-item-label">${c.label}</span>
+                <span class="col-item-desc">${c.detail}</span>
+              </div>
+            </li>`).join('')}
+        </ul>
+      </div>`;
+
+    document.getElementById('ai-summary').innerHTML = `<strong>Analyst verdict:</strong> ${parsed.summary}`;
+    document.getElementById('ai-results').style.display = 'block';
+
+  } catch (err) {
+    clearInterval(msgInterval);
+    loading.style.display = 'none';
+    document.getElementById('ai-idle').style.display = 'block';
+    document.getElementById('ai-idle').innerHTML = `<div class="ai-idle-icon">⚠</div>Analysis failed. Please try again.`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '↺ Re-analyze';
+}
+// ═══════════ NEARSHORING CALCULATOR ═══════════
+
+const NS_COUNTRY_NAMES = COUNTRY_NAMES;
+
+// ── Transformation country data ──
+// ftaType: 'usmca' | 'fta' | 'none'
+// importTariff: what this country charges on raw materials from APAC (approx MFN)
+// sec232ExemptUS: does the US exempt them from Sec 232 ('yes'|'conditional'|false)
+// sec122ExemptUS: does USMCA/FTA exempt them from US Sec 122
+const TRANSFORM_COUNTRIES = {
+  mexico:             { name:'Mexico',             code:'mx', ftaType:'usmca', ftaName:'USMCA',                 rvcReq:60, sec232ExemptUS:'conditional', sec122ExemptUS:true,  importTariff:{ raw_al:0.10, raw_steel:0.08, al_led:0.15, mixed:0.15, print_graphics:0.10 } },
+  canada:             { name:'Canada',             code:'ca', ftaType:'usmca', ftaName:'USMCA',                 rvcReq:60, sec232ExemptUS:'conditional', sec122ExemptUS:true,  importTariff:{ raw_al:0.00, raw_steel:0.00, al_led:0.05, mixed:0.05, print_graphics:0.05 } },
+  colombia:           { name:'Colombia',           code:'co', ftaType:'fta',   ftaName:'US–Colombia FTA',       rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.12, raw_steel:0.10, al_led:0.15, mixed:0.15, print_graphics:0.12 } },
+  peru:               { name:'Peru',               code:'pe', ftaType:'fta',   ftaName:'US–Peru FTA',           rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.08, al_led:0.12, mixed:0.12, print_graphics:0.10 } },
+  chile:              { name:'Chile',              code:'cl', ftaType:'fta',   ftaName:'US–Chile FTA',          rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.06, raw_steel:0.06, al_led:0.06, mixed:0.06, print_graphics:0.06 } },
+  costa_rica:         { name:'Costa Rica',         code:'cr', ftaType:'fta',   ftaName:'CAFTA-DR',              rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.05, al_led:0.10, mixed:0.10, print_graphics:0.10 } },
+  dominican_republic: { name:'Dominican Republic', code:'do', ftaType:'fta',   ftaName:'CAFTA-DR',              rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.05, al_led:0.10, mixed:0.10, print_graphics:0.10 } },
+  panama:             { name:'Panama',             code:'pa', ftaType:'fta',   ftaName:'US–Panama TPA',         rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.05, al_led:0.10, mixed:0.10, print_graphics:0.10 } },
+  israel:             { name:'Israel',             code:'il', ftaType:'fta',   ftaName:'US–Israel FTA',         rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.08, raw_steel:0.05, al_led:0.10, mixed:0.10, print_graphics:0.08 } },
+  jordan:             { name:'Jordan',             code:'jo', ftaType:'fta',   ftaName:'US–Jordan FTA',         rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.08, al_led:0.12, mixed:0.12, print_graphics:0.10 } },
+  morocco:            { name:'Morocco',            code:'ma', ftaType:'fta',   ftaName:'US–Morocco FTA',        rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.08, al_led:0.25, mixed:0.25, print_graphics:0.12 } },
+  australia_t:        { name:'Australia',          code:'au', ftaType:'fta',   ftaName:'AUSFTA',                rvcReq:50, sec232ExemptUS:true,          sec122ExemptUS:false, importTariff:{ raw_al:0.05, raw_steel:0.00, al_led:0.05, mixed:0.05, print_graphics:0.05 } },
+  singapore_t:        { name:'Singapore',          code:'sg', ftaType:'fta',   ftaName:'US–Singapore FTA',      rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.00, raw_steel:0.00, al_led:0.00, mixed:0.00, print_graphics:0.00 } },
+  south_korea_t:      { name:'South Korea',        code:'kr', ftaType:'fta',   ftaName:'KORUS FTA',             rvcReq:35, sec232ExemptUS:false,         sec122ExemptUS:false, importTariff:{ raw_al:0.08, raw_steel:0.05, al_led:0.08, mixed:0.08, print_graphics:0.08 } },
+  germany:            { name:'Germany',            code:'de', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.06, raw_steel:0.00, al_led:0.034,mixed:0.034,print_graphics:0.00 } },
+  ireland:            { name:'Ireland',            code:'ie', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.06, raw_steel:0.00, al_led:0.034,mixed:0.034,print_graphics:0.00 } },
+  poland:             { name:'Poland',             code:'pl', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.06, raw_steel:0.00, al_led:0.034,mixed:0.034,print_graphics:0.00 } },
+  turkey:             { name:'Turkey',             code:'tr', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.13, raw_steel:0.13, al_led:0.18, mixed:0.18, print_graphics:0.13 } },
+  portugal:           { name:'Portugal',           code:'pt', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.06, raw_steel:0.00, al_led:0.034,mixed:0.034,print_graphics:0.00 } },
+  vietnam_t:          { name:'Vietnam',            code:'vn', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.05, al_led:0.15, mixed:0.15, print_graphics:0.10 } },
+  thailand_t:         { name:'Thailand',           code:'th', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.05, al_led:0.15, mixed:0.15, print_graphics:0.10 } },
+  indonesia_t:        { name:'Indonesia',          code:'id', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.15, raw_steel:0.10, al_led:0.15, mixed:0.15, print_graphics:0.12 } },
+  malaysia_t:         { name:'Malaysia',           code:'my', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.15, raw_steel:0.05, al_led:0.10, mixed:0.10, print_graphics:0.10 } },
+  india_t:            { name:'India',              code:'in', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.075,raw_steel:0.125,al_led:0.15, mixed:0.15, print_graphics:0.10 } },
+  philippines_t:      { name:'Philippines',        code:'ph', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.05, al_led:0.15, mixed:0.15, print_graphics:0.10 } },
+  bangladesh_t:       { name:'Bangladesh',         code:'bd', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.15, raw_steel:0.10, al_led:0.15, mixed:0.15, print_graphics:0.12 } },
+  cambodia_t:         { name:'Cambodia',           code:'kh', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.15, raw_steel:0.10, al_led:0.15, mixed:0.15, print_graphics:0.12 } },
+  taiwan_t:           { name:'Taiwan',             code:'tw', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.00, raw_steel:0.00, al_led:0.05, mixed:0.05, print_graphics:0.00 } },
+  japan_t:            { name:'Japan',              code:'jp', ftaType:'none',  ftaName:'Limited (digital/ag)',  rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.00, raw_steel:0.00, al_led:0.00, mixed:0.00, print_graphics:0.00 } },
+  china_t:            { name:'China',              code:'cn', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.05, raw_steel:0.05, al_led:0.08, mixed:0.08, print_graphics:0.08 } },
+  south_africa:       { name:'South Africa',       code:'za', ftaType:'none',  ftaName:'AGOA (textile only)',   rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.15, raw_steel:0.10, al_led:0.15, mixed:0.15, print_graphics:0.10 } },
+  egypt:              { name:'Egypt',              code:'eg', ftaType:'none',  ftaName:null,                    rvcReq:null, sec232ExemptUS:false,       sec122ExemptUS:false, importTariff:{ raw_al:0.10, raw_steel:0.10, al_led:0.30, mixed:0.30, print_graphics:0.20 } },
+};
+
+// US MFN rate on finished product by HTS
+const NS_US_MFN = { '6307':0.07, '9403':0.00, '6211':0.12, '7616':0.03 };
+const NS_HTS_LABELS = { '6307':'6307.90', '9403':'9403.10', '6211':'6211.xx', '7616':'7616.99' };
+
+// Direct import (APAC → USA) comparison rates
+const NS_DIRECT_S232       = { raw_al:0.50, raw_steel:0.50, al_led:0.25, mixed:0.25, print_graphics:0.00 };
+const NS_DIRECT_MFN        = { raw_al:0.025, raw_steel:0.00, al_led:0.035, mixed:0.03, print_graphics:0.037 };
+const NS_DIRECT_S301_CHINA = { raw_al:0.00, raw_steel:0.00, al_led:0.075, mixed:0.075, print_graphics:0.075 };
+
+function nsRow(label, val, cls='') {
+  return `<div class="ns-lr ${cls}"><span class="lk">${label}</span><span class="lv">${val}</span></div>`;
+}
+function nsCompRow(label, val) {
+  return `<div class="ns-compare-row"><span class="ck">${label}</span><span class="cv">${val}</span></div>`;
+}
+
+function nsUpdateUI(tc) {
+  // Update flow node
+  document.getElementById('flow-transform-name').textContent = tc.name;
+  document.getElementById('flow-transform-flag').className = `fi fi-${tc.code} ns-flag-icon`;
+
+  // Update flag display in Leg 2
+  document.getElementById('flag-img-transform').className = `fi fi-${tc.code} flag-icon-display`;
+  document.getElementById('flag-label-transform').textContent = tc.name;
+  document.getElementById('flag-fta-transform').textContent = tc.ftaType === 'none' ? 'No US FTA' : tc.ftaName;
+
+  // Update card headers
+  const originName = NS_COUNTRY_NAMES[document.getElementById('ns-country').value] || 'Origin';
+  const originCode = COUNTRY_CODES[document.getElementById('ns-country').value] || 'un';
+
+  // Update card header flags and titles
+  const leg1Flag = document.getElementById('ns-leg1-flag');
+  if (leg1Flag) leg1Flag.className = `fi fi-${originCode} ns-card-header-flag`;
+  const leg1Title = document.getElementById('ns-leg1-title');
+  if (leg1Title) leg1Title.textContent = `${originName} → ${tc.name}`;
+
+  const leg2Flag = document.getElementById('ns-leg2-flag');
+  if (leg2Flag) leg2Flag.className = `fi fi-${tc.code} ns-card-header-flag`;
+  const leg2Title = document.getElementById('ns-leg2-title');
+  if (leg2Title) leg2Title.textContent = `${tc.name} — Transformation`;
+
+  const leg3Title = document.getElementById('ns-leg3-title');
+  if (leg3Title) leg3Title.textContent = `${tc.name} → United States`;
+
+  // Update card headers (legacy ids kept for backward compat)
+  document.getElementById('ns-leg1-header');
+  document.getElementById('ns-leg2-header');
+  document.getElementById('ns-leg3-header');
+
+  // Update FTA field
+  const ftaLabel = document.getElementById('ns-fta-label');
+  const ftaSelect = document.getElementById('ns-usmca');
+  const ftaHint   = document.getElementById('ns-fta-hint');
+
+  if (tc.ftaType === 'usmca') {
+    ftaLabel.textContent = `${tc.ftaName} certification`;
+    ftaSelect.innerHTML = `
+      <option value="claimed">Claimed — tariff shift + RVC ≥${tc.rvcReq}% met</option>
+      <option value="borderline">Borderline — RVC near threshold</option>
+      <option value="not_claimed">Not claimed / does not qualify</option>`;
+    ftaHint.textContent = `${tc.ftaName} requires ≥${tc.rvcReq}% Regional Value Content (transaction value method) and a tariff classification shift from inputs. USMCA goods are also exempt from Section 122.`;
+  } else if (tc.ftaType === 'fta') {
+    ftaLabel.textContent = `${tc.ftaName} certification`;
+    ftaSelect.innerHTML = `
+      <option value="claimed">Certificate of origin provided — RVC ≥${tc.rvcReq}% met</option>
+      <option value="borderline">Borderline — rules of origin uncertain</option>
+      <option value="not_claimed">Not claimed / does not qualify</option>`;
+    ftaHint.textContent = `${tc.ftaName} may reduce or eliminate MFN duty. Section 122 (10%) still applies — FTAs do not override this temporary surcharge. RVC threshold: ≥${tc.rvcReq}%.`;
+  } else {
+    ftaLabel.textContent = 'Trade agreement';
+    ftaSelect.innerHTML = `<option value="not_claimed">No US FTA — standard MFN + Sec 122 apply</option>`;
+    ftaHint.textContent = tc.ftaName ? `Note: ${tc.ftaName} — limited coverage, standard MFN applies to manufactured goods.` : `No US free trade agreement exists with ${tc.name}. Standard MFN rates and Section 122 (10%) apply.`;
+  }
+
+  // Update Sec 232 hint
+  const s232Hint = document.getElementById('ns-sec232-hint');
+  if (tc.sec232ExemptUS === true) {
+    s232Hint.textContent = `${tc.name} is exempt from US Section 232 tariffs under a bilateral arrangement. Sec. 232 does not apply regardless of metal origin.`;
+  } else if (tc.sec232ExemptUS === 'conditional') {
+    s232Hint.textContent = `${tc.name} may be conditionally exempt from Sec. 232 if metal was smelted and poured in the USA. Otherwise full Sec. 232 rates apply.`;
+  } else {
+    s232Hint.textContent = `Sec. 232 applies on metal content even with FTA certification, unless the aluminum/steel was smelted in the USA.`;
+  }
+
+  // Update Leg 1 hint
+  document.getElementById('ns-leg1-hint').textContent = `FOB value of goods shipped from origin to ${tc.name}`;
+  document.getElementById('ns-fabric-hint').textContent = `Cost of materials added in ${tc.name} (local or qualifying-origin)`;
+}
+
+function nsCalc() {
+  const originKey    = document.getElementById('ns-country').value;
+  const transformKey = document.getElementById('ns-transform-country').value;
+  const product      = document.getElementById('ns-product').value;
+  const matVal       = parseFloat(document.getElementById('ns-mat-value').value)    || 0;
+  const fabricVal    = parseFloat(document.getElementById('ns-fabric-value').value) || 0;
+  const laborVal     = parseFloat(document.getElementById('ns-labor-value').value)  || 0;
+  const qty          = parseInt(document.getElementById('ns-qty').value)            || 1;
+  const ftaClaim     = document.getElementById('ns-usmca').value;
+  const sec232opt    = document.getElementById('ns-sec232').value;
+  const htsFin       = document.getElementById('ns-finished-hts').value;
+
+  const tc = TRANSFORM_COUNTRIES[transformKey] || TRANSFORM_COUNTRIES.mexico;
+  nsUpdateUI(tc);
+
+  const originName = NS_COUNTRY_NAMES[originKey] || originKey;
+  const isOriginChina = originKey === 'china';
+
+  // ── LEG 1: Origin → Transformation country ──
+  const leg1Rate   = (tc.importTariff[product] ?? 0.10);
+  const mxTariff   = matVal * leg1Rate;
+  const mxLanded   = matVal + mxTariff;
+
+  // ── LEG 2: Transformation ──
+  const mexicoValueAdded   = fabricVal + laborVal;
+  const finishedGoodsVal   = mxLanded + mexicoValueAdded;
+  const finishedGoodsValFOB = matVal + mexicoValueAdded;
+
+  // RVC calculation
+  const nonOrig      = matVal;
+  const totalFOB     = finishedGoodsValFOB;
+  const rvc          = totalFOB > 0 ? ((totalFOB - nonOrig) / totalFOB) * 100 : 0;
+  const rvcThreshold = tc.rvcReq || 60;
+
+  // ── LEG 3: Transformation → USA ──
+  const usMfnRate = NS_US_MFN[htsFin] || 0.05;
+  const usMfnAmt  = finishedGoodsVal * usMfnRate;
+
+  let usS232Amt = 0, usS122Amt = 0, usDutyMfn = usMfnAmt;
+  let usmcaClass = 'unqualified', usmcaMsg = '';
+  const qualifies = ftaClaim === 'claimed' && rvc >= rvcThreshold;
+  const borderline = ftaClaim === 'borderline' || (ftaClaim === 'claimed' && rvc >= rvcThreshold - 5 && rvc < rvcThreshold);
+
+  if (tc.sec232ExemptUS === true) {
+    usS232Amt = 0; // fully exempt
+  } else if (sec232opt === 'yes') {
+    const metalShare = matVal / finishedGoodsVal;
+    usS232Amt = finishedGoodsVal * metalShare * 0.25;
+  }
+
+  if (tc.ftaType === 'none') {
+    // No FTA: full MFN + Sec 122
+    usS122Amt = finishedGoodsVal * 0.10;
+    usDutyMfn = usMfnAmt;
+    usmcaClass = 'unqualified';
+    usmcaMsg = `✗ No US free trade agreement with ${tc.name}. Standard MFN (${fmtPct(usMfnRate*100)}) and Section 122 (10%) both apply. ${tc.ftaName ? 'Note: ' + tc.ftaName + '.' : ''}`;
+  } else if (qualifies) {
+    // FTA qualifies: 0% MFN; USMCA also exempts Sec 122
+    usDutyMfn = 0;
+    if (!tc.sec122ExemptUS) usS122Amt = finishedGoodsVal * 0.10; // non-USMCA FTA: Sec 122 still hits
+    usmcaClass = 'qualified';
+    const sec122Note = tc.sec122ExemptUS ? 'Section 122 is also exempt (USMCA).' : 'Note: Section 122 (10%) still applies — FTAs do not override this temporary surcharge.';
+    usmcaMsg = `✓ ${tc.ftaName} qualifies. Calculated RVC: ${rvc.toFixed(1)}% (threshold: ${rvcThreshold}%). MFN duty is 0%. ${sec122Note} ${sec232opt === 'yes' && tc.sec232ExemptUS !== true ? 'Section 232 still applies on metal content.' : ''}`;
+  } else if (borderline) {
+    usDutyMfn = usMfnAmt * 0.5;
+    usS122Amt = finishedGoodsVal * 0.10 * 0.5;
+    if (sec232opt === 'yes' && tc.sec232ExemptUS !== true) usS232Amt *= 0.5;
+    usmcaClass = 'borderline';
+    usmcaMsg = `⚠ Borderline ${tc.ftaName}. Calculated RVC: ${rvc.toFixed(1)}% — close to the ${rvcThreshold}% threshold. Rates use blended risk-adjusted estimate. Increase value-add in ${tc.name} to clear the threshold.`;
+  } else {
+    // FTA exists but not claimed
+    usDutyMfn = usMfnAmt;
+    usS122Amt = finishedGoodsVal * 0.10;
+    usmcaClass = 'unqualified';
+    usmcaMsg = `✗ ${tc.ftaName} not claimed or RVC of ${rvc.toFixed(1)}% does not meet the ${rvcThreshold}% threshold. Standard MFN (${fmtPct(usMfnRate*100)}) and Section 122 (10%) apply. Increase ${tc.name} value-add to qualify.`;
+  }
+
+  const leg3Tariff   = usDutyMfn + usS232Amt + usS122Amt;
+  const usLandedCost = finishedGoodsVal + leg3Tariff;
+  const totalTariff  = (mxTariff + leg3Tariff) * qty;
+  const totalLanded  = usLandedCost * qty;
+
+  // ── Direct import comparison ──
+  const directMatVal = matVal + mexicoValueAdded;
+  const directS232   = directMatVal * NS_DIRECT_S232[product];
+  const directMfn    = directMatVal * NS_DIRECT_MFN[product];
+  const directS301   = isOriginChina ? directMatVal * NS_DIRECT_S301_CHINA[product] : 0;
+  const directS122   = directMatVal * 0.10; // always applies on direct import
+  const directTariff = (directS232 + directMfn + directS301 + directS122) * qty;
+  const directLanded = (directMatVal + directS232 + directMfn + directS301 + directS122) * qty;
+
+  const saving    = directLanded - totalLanded;
+
+  // ── Render ──
+  document.getElementById('ns-total-landed').textContent = fmt(totalLanded);
+  document.getElementById('ns-total-tariff').textContent = fmt(totalTariff);
+  const vsEl = document.getElementById('ns-vs-direct');
+  if (saving > 0)      { vsEl.textContent = `Save ${fmt(saving)}`;           vsEl.className = 'vv saving'; }
+  else if (saving < 0) { vsEl.textContent = `+${fmt(Math.abs(saving))} more`; vsEl.className = 'vv extra'; }
+  else                 { vsEl.textContent = 'Same';                           vsEl.className = 'vv'; }
+
+  document.getElementById('ns-leg1-rows').innerHTML =
+    nsRow('Raw materials (FOB)', fmt(matVal)) +
+    nsRow(`${tc.name} import tariff (${fmtPct(leg1Rate*100)})`, fmt(mxTariff)) +
+    nsRow(`Landed in ${tc.name}`, fmt(mxLanded), 'subtotal');
+
+  document.getElementById('ns-leg2-rows').innerHTML =
+    nsRow('Printed fabric / materials', fmt(fabricVal)) +
+    nsRow('Labor & overhead', fmt(laborVal)) +
+    nsRow('RVC (FTA test)', `${rvc.toFixed(1)}% / ${rvcThreshold}% req`) +
+    nsRow('Ex-factory value', fmt(finishedGoodsVal), 'subtotal');
+
+  const leg3rows = [];
+  if (qualifies && tc.ftaType !== 'none') {
+    leg3rows.push(nsRow(`${tc.ftaName} duty`, 'Free — 0%'));
+  } else {
+    leg3rows.push(nsRow(`MFN (${NS_HTS_LABELS[htsFin]}, ${fmtPct(usMfnRate*100)})`, fmt(usDutyMfn)));
+  }
+  if (usS122Amt > 0) leg3rows.push(nsRow('Section 122 (10%)', fmt(usS122Amt)));
+  if (usS232Amt > 0) leg3rows.push(nsRow('Section 232 (metal content)', fmt(usS232Amt)));
+  if (tc.sec232ExemptUS === true) leg3rows.push(nsRow('Section 232', 'Exempt — bilateral deal'));
+  leg3rows.push(nsRow('US tariff total', fmt(leg3Tariff), 'subtotal'));
+  document.getElementById('ns-leg3-rows').innerHTML = leg3rows.join('');
+
+  const uBar = document.getElementById('ns-usmca-bar');
+  uBar.className = 'usmca-bar ' + usmcaClass;
+  document.getElementById('ns-usmca-text').innerHTML = usmcaMsg;
+
+  // Comparison columns
+  document.getElementById('ns-col-near').innerHTML =
+    nsCompRow('Raw materials', fmt(matVal * qty)) +
+    nsCompRow(`${tc.name} import tariff`, fmt(mxTariff * qty)) +
+    nsCompRow('Value-add in transform country', fmt(mexicoValueAdded * qty)) +
+    nsCompRow('US import tariff', fmt(leg3Tariff * qty));
+
+  document.getElementById('ns-col-direct').innerHTML =
+    nsCompRow('Materials (same basis)', fmt(directMatVal * qty)) +
+    nsCompRow('Section 232', fmt(directS232 * qty)) +
+    nsCompRow('MFN base duty', fmt(directMfn * qty)) +
+    nsCompRow('Section 122 (10%)', fmt(directS122 * qty)) +
+    (directS301 > 0 ? nsCompRow('Section 301 (China)', fmt(directS301 * qty)) : '') +
+    nsCompRow('Transformation value-add', '—');
+
+  document.getElementById('ns-near-total-label').textContent = fmt(totalLanded);
+  document.getElementById('ns-near-total-label').className = saving >= 0 ? 'winner' : 'loser';
+  document.getElementById('ns-direct-total-label').textContent = fmt(directLanded);
+  document.getElementById('ns-direct-total-label').className = saving >= 0 ? 'loser' : 'winner';
+}
+
+['ns-country','ns-transform-country','ns-product','ns-mat-value','ns-fabric-value','ns-labor-value','ns-qty','ns-usmca','ns-sec232','ns-finished-hts'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.addEventListener('input', nsCalc); el.addEventListener('change', nsCalc); }
+});
+
+try { nsCalc(); } catch(e) { console.warn('nsCalc init error:', e); }
+// ═══════════ ASK ME A QUESTION ═══════════
+
+const qaHistory = [];
+
+function qaSetStatus(state) {
+  const el = document.getElementById('qa-status');
+  if (state === 'ready')    { el.textContent = 'Ready';     el.className = 'qa-status'; }
+  if (state === 'thinking') { el.textContent = 'Thinking…'; el.className = 'qa-status thinking'; }
+  if (state === 'active')   { el.textContent = 'Online';    el.className = 'qa-status active'; }
+}
+
+function qaAppendMsg(role, html, isTyping = false) {
+  const box = document.getElementById('qa-messages');
+  const div = document.createElement('div');
+  div.className = `qa-msg ${role}`;
+  const avatar = role === 'user' ? 'You' : 'AI';
+  if (isTyping) {
+    div.id = 'qa-typing-bubble';
+    div.innerHTML = `<div class="qa-msg-avatar">${avatar}</div><div class="qa-msg-text"><div class="qa-typing"><span></span><span></span><span></span></div></div>`;
+  } else {
+    div.innerHTML = `<div class="qa-msg-avatar">${avatar}</div><div class="qa-msg-text">${html}</div>`;
+  }
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function qaRemoveTyping() {
+  const t = document.getElementById('qa-typing-bubble');
+  if (t) t.remove();
+}
+
+function qaGetContext() {
+  const country = document.getElementById('country')?.value || 'unknown';
+  const countryName = COUNTRY_NAMES[country] || country;
+  const product = ITEM_NAMES[selItem] || 'aluminum product';
+  const tariff = document.getElementById('total-amt')?.textContent || 'unknown';
+  const rate = document.getElementById('eff-rate')?.textContent || 'unknown';
+  return `The user is currently using an Asia-Pacific US Import Tariff Calculator. Selected country: ${countryName}. Selected product: ${product}. Estimated tariff: ${tariff} (effective rate: ${rate}). Current date: May 2026. US tariff regime: Section 232 (50% raw metals, 25% derivatives), Section 122 (10% global baseline, expires ~Jul 24 2026), Section 301 on Chinese goods (7.5–100%).`;
+}
+
+function clearChat() {
+  qaHistory.length = 0;
+  document.getElementById('qa-messages').innerHTML = '';
+  document.getElementById('qa-input').value = '';
+  document.getElementById('qa-send').disabled = false;
+  qaSetStatus('ready');
+
+  // Brief visual confirmation flash on the button
+  const btn = document.getElementById('qa-clear');
+  btn.textContent = '✓ Cleared';
+  btn.style.color = '#4dbb7a';
+  btn.style.borderColor = 'rgba(77,187,122,0.4)';
+  btn.style.background = 'rgba(77,187,122,0.1)';
+  setTimeout(() => {
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg> Restart`;
+    btn.style.color = '';
+    btn.style.borderColor = '';
+    btn.style.background = '';
+  }, 1200);
+}
+
+async function sendQuestion(questionOverride) {
+  const input = document.getElementById('qa-input');
+  const question = questionOverride || input.value.trim();
+  if (!question) return;
+
+  const sendBtn = document.getElementById('qa-send');
+  input.value = '';
+  sendBtn.disabled = true;
+  qaSetStatus('thinking');
+
+  qaAppendMsg('user', question);
+  qaAppendMsg('assistant', '', true);
+
+  qaHistory.push({ role: 'user', content: question });
+
+  const systemPrompt = `You are a knowledgeable US trade and tariff assistant specializing in Asia-Pacific import scenarios. You give clear, direct, practical answers about US customs duties, HTS codes, trade policy (Section 232, Section 301, Section 122, USMCA), and sourcing strategy. Keep answers concise — 2–4 sentences unless more detail is needed. Use plain language, not jargon, unless the user is clearly knowledgeable. Context: ${qaGetContext()}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: getApiHeaders(),
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: qaHistory.slice(-10),
+      }),
+    });
+
+    const data = await response.json();
+    const answer = (data.content || []).map(b => b.text || '').join('').trim();
+
+    qaHistory.push({ role: 'assistant', content: answer });
+
+    qaRemoveTyping();
+    qaAppendMsg('assistant', answer.replace(/\n/g, '<br>'));
+    qaSetStatus('active');
+
+  } catch (err) {
+    qaRemoveTyping();
+    qaAppendMsg('assistant', 'Sorry, I couldn\'t reach the assistant right now. Please try again.');
+    qaSetStatus('ready');
+  }
+
+  sendBtn.disabled = false;
+}
+
+function askChip(btn) {
+  document.getElementById('qa-input').value = btn.textContent;
+  sendQuestion();
+}
+
+document.getElementById('qa-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuestion(); }
+});
+</script>
+</body>
+</html>
